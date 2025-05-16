@@ -1,21 +1,32 @@
 <?php
-include 'db_connect.php';
+include "db_connect.php";
 
-
-if (!isset($_SESSION['login_type'])) {
+if (!isset($_SESSION["login_type"])) {
     header("Location: login.php");
     exit();
 }
 
-if (isset($_SESSION['invalid_attempts']) && $_SESSION['invalid_attempts'] >= 3) {
-    $_SESSION['invalid_attempts'] = 0;
+if (
+    isset($_SESSION["invalid_attempts"]) &&
+    $_SESSION["invalid_attempts"] >= 3
+) {
+    $_SESSION["invalid_attempts"] = 0;
 }
 
-$total_visitors_today = $conn->query("SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()")->fetch_assoc()['total'];
-$total_establishments = $conn->query("SELECT COUNT(*) as total FROM establishments")->fetch_assoc()['total'];
-$total_students = $conn->query("SELECT COUNT(*) as total FROM persons")->fetch_assoc()['total'];
-$total_staff = $conn->query("SELECT COUNT(*) as total FROM users WHERE type = 2")->fetch_assoc()['total'];
-
+$total_visitors_today = $conn
+    ->query(
+        "SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()"
+    )
+    ->fetch_assoc()["total"];
+$total_establishments = $conn
+    ->query("SELECT COUNT(*) as total FROM establishments")
+    ->fetch_assoc()["total"];
+$total_students = $conn
+    ->query("SELECT COUNT(*) as total FROM persons")
+    ->fetch_assoc()["total"];
+$total_staff = $conn
+    ->query("SELECT COUNT(*) as total FROM users WHERE type = 2")
+    ->fetch_assoc()["total"];
 
 $college_course = [];
 $college_course_query = $conn->query("
@@ -52,7 +63,7 @@ GROUP BY hour
 ORDER BY hour");
 
 while ($row = $daily_query->fetch_assoc()) {
-    $daily[] = ['date' => $row['hour'], 'total' => $row['total']];
+    $daily[] = ["date" => $row["hour"], "total" => $row["total"]];
 }
 
 $weekly = [];
@@ -81,7 +92,6 @@ while ($row = $yearly_query->fetch_assoc()) {
     $yearly[] = $row;
 }
 
-
 $hourly = [];
 $hourly_query = $conn->query("SELECT HOUR(date_created) as hour, COUNT(*) as total
     FROM person_tracks
@@ -90,19 +100,19 @@ while ($row = $hourly_query->fetch_assoc()) {
     $hourly[] = $row;
 }
 
-
 $perPage = 5;
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
 $offset = ($page - 1) * $perPage;
-$totalQuery = $conn->query("SELECT COUNT(*) as total FROM failed_login_attempts");
+$totalQuery = $conn->query(
+    "SELECT COUNT(*) as total FROM failed_login_attempts"
+);
 $totalRow = $totalQuery->fetch_assoc();
-$totalResults = $totalRow['total'];
+$totalResults = $totalRow["total"];
 $totalPages = ceil($totalResults / $perPage);
 
-
 $failed_attempts = [];
-if ($_SESSION['login_type'] == 1) {
-    $user_id = $_SESSION['login_id'];
+if ($_SESSION["login_type"] == 1) {
+    $user_id = $_SESSION["login_id"];
     $query = $conn->query("
         SELECT f.date_created, e.name as establishment, f.error_message
         FROM failed_login_attempts f
@@ -127,6 +137,7 @@ if ($_SESSION['login_type'] == 1) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | PLMUN ACS</title>
 
+    <link rel="stylesheet" href="home.css?v=<?php echo time(); ?>">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -137,6 +148,7 @@ if ($_SESSION['login_type'] == 1) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+
 
     <!-- Custom CSS -->
 
@@ -156,18 +168,19 @@ if ($_SESSION['login_type'] == 1) {
 
     <!-- Main Dashboard Content -->
     <main class="dashboard-container">
-        <div class="dashboard-header">
+        <!-- <div class="dashboard-header">
             <h1>Welcome to Pamantasan ng Lungsod ng Muntinlupa</h1> <br>
-            <h2>You are now Entering <?php echo htmlspecialchars($_SESSION['login_name']); ?> </h2>
-        </div>
+            <h2>You are now Entering <?php echo htmlspecialchars(
+                $_SESSION["login_name"]
+            ); ?> </h2>
+        </div> -->
         <!-- eto yung admin side -->
-        <?php if ($_SESSION['login_type'] == 1): ?>
+        <?php if ($_SESSION["login_type"] == 1): ?>
             <!-- Statistics Cards -->
-            <div class="card dashboard-card">
                 <div class="card-header dashboard-card-header">
-                    <b>Dashboard and Analytics</b>
+                    <b style="color: white; font-size: 30px;">Dashboard and Analytics</b>
                 </div>
-                <div class="card-body dashboard-card-body">
+
                     <div class="row">
                         <div class="col-md-3">
                             <div class="stat-card visitors">
@@ -203,61 +216,76 @@ if ($_SESSION['login_type'] == 1) {
                     </div>
 
                     <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card dashboard-card">
-                                <div class="card-header dashboard-card-header">
-                                    <b>Failed Login Attempts</b>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Establishment</th>
-                                                    <th>Error</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($failed_attempts as $attempt): ?>
-                                                    <tr>
-                                                        <td><?php echo $attempt['date_created']; ?></td>
-                                                        <td><?php echo $attempt['establishment']; ?></td>
-                                                        <td><?php echo $attempt['error_message']; ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-shield-lock text-danger fs-5"></i>
+                                        <h5 class="mb-0 fw-semibold text-dark">Failed Login Attempts</h5>
                                     </div>
+                                    <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" type="button"
+                                        data-id="<?php echo $row["id"]; ?>">
+                                        <i class="bi bi-trash3"></i> Clear Logs
+                                    </button>
+                                </div>
 
-                                    <!-- Pagination -->
-                                    <nav>
-                                        <ul class="pagination justify-content-center">
-                                            <?php if ($page > 1): ?>
-                                                <li class="page-item"><a class="page-link"
-                                                        href="?page=<?php echo $page - 1; ?>">Previous</a></li>
-                                            <?php endif; ?>
+                                <div class="card-body px-4 pb-4">
+                                    <?php if (count($failed_attempts) > 0): ?>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="text-muted small">Date</th>
+                                                        <th class="text-muted small">Establishment</th>
+                                                        <th class="text-muted small">Error</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($failed_attempts as $attempt): ?>
+                                                        <tr>
+                                                            <td><?php echo $attempt["date_created"]; ?></td>
+                                                            <td><?php echo $attempt["establishment"]; ?></td>
+                                                            <td><?php echo $attempt["error_message"]; ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
 
-                                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                                </li>
-                                            <?php endfor; ?>
+                                        <!-- Pagination -->
+                                        <?php if ($totalPages > 1): ?>
+                                            <nav class="mt-4">
+                                                <ul class="pagination justify-content-center mb-0">
+                                                    <?php if ($page > 1): ?>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="?page=<?php echo $page - 1; ?>">&laquo;</a>
+                                                        </li>
+                                                    <?php endif; ?>
 
-                                            <?php if ($page < $totalPages): ?>
-                                                <li class="page-item"><a class="page-link"
-                                                        href="?page=<?php echo $page + 1; ?>">Next</a></li>
-                                            <?php endif; ?>
-                                        </ul>
-                                    </nav>
+                                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                                                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                                        </li>
+                                                    <?php endfor; ?>
 
-                                    <button class="btn btn-sm btn-outline-danger delete_person mb-2 mb-md-0" type="button"
-                                        data-id="<?php echo $row['id']; ?>">Delete all logs</button>
-
+                                                    <?php if ($page < $totalPages): ?>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="?page=<?php echo $page + 1; ?>">&raquo;</a>
+                                                        </li>
+                                                    <?php endif; ?>
+                                                </ul>
+                                            </nav>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="alert alert-success mb-0" role="alert">
+                                            🎉 No failed login attempts found.
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     <!-- Charts Section -->
                     <div class="row mt-5">
@@ -292,42 +320,27 @@ if ($_SESSION['login_type'] == 1) {
 
                         <div class="col-md-6 mb-4">
                             <div class="card">
-                                <div class="card-header bg-warning text-white">Weekly Entries</div>
-                                <div class="card-body">
-                                    <canvas id="weeklyChart"></canvas>
+                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                    <span>Time Period Analytics</span>
+                                    <select class="form-select form-select-sm" id="timePeriodSelect" style="width: 150px;">
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header bg-danger text-white">Monthly Entries</div>
                                 <div class="card-body">
-                                    <canvas id="monthlyChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mb-4">
-                            <div class="card">
-                                <div class="card-header bg-info text-white">Yearly Entries</div>
-                                <div class="card-body">
-                                    <canvas id="yearlyChart"></canvas>
+                                    <canvas id="timePeriodChart"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        <?php endif ?>
+        <?php endif; ?>
 
         <!-- end of admin side -->
-
-        </div>
     </main>
 
     <!-- start ng staff dashboard -->
-    <?php if ($_SESSION['login_type'] == 2): ?>
+    <?php if ($_SESSION["login_type"] == 2): ?>
 
 
         <div id="splashOverlay">
@@ -345,27 +358,32 @@ if ($_SESSION['login_type'] == 1) {
 
         <div class="container">
             <div class="row">
-                <!-- Left side: Tracking Form -->
                 <div class="col-md-12">
                     <div class="tracking-form">
                         <div class="card-body">
                             <div style="display: flex; justify-content: center;">
                                 <img class="card-logo-plmun" src="assets/img/PLMUNLOGO.png">
                             </div>
+                            <div class="welcome-message">
+                              <h3 class="welcome-heading">Welcome to Pamantasan ng Lungsod ng Muntinlupa</h3><br>
+                              <h3 class="entering-text">You are now entering <?php echo htmlspecialchars(
+                                  $_SESSION["login_name"]
+                              ); ?></h3>
 
-                            <h1 class="card-body-title">PLASE SCAN YOUR QR CODE TO ENTER</h1>
-
+                            </div>
+                            <h1 class="card-body-title">Please scan your QR Code to enter.</h1>
                             <hr>
                             <form action="" id="manage-records">
-                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
+                                <input type="hidden" name="id" value="<?php echo isset(
+                                    $id
+                                )
+                                    ? $id
+                                    : ""; ?>">
                                 <div class="form-group mb-3">
                                     <div class="qr-scanner-container">
                                         <!-- Input Field (Behind) -->
                                         <input type="number" class="scanner-input" id="student_id" name="student_id"
                                             autocomplete="off" placeholder="Enter Student ID" oninput="checkIDAuto()">
-
-
-
                                         <!-- QR Code Image Design (Front) -->
                                         <div class="qr-overlay">
                                             <img src="assets/img/barcodelogo.png" alt="QR Code" class="qr-code-image">
@@ -373,6 +391,8 @@ if ($_SESSION['login_type'] == 1) {
                                             <div class="laser-dot"></div>
                                             <div class="scanner-frame"></div>
                                         </div>
+
+
 
                                     </div>
 
@@ -387,7 +407,9 @@ if ($_SESSION['login_type'] == 1) {
                                 <div id="details" style="display:none">
                                     <input type="hidden" name="person_id" value="">
                                     <input type="hidden" name="establishment_id"
-                                        value="<?php echo $_SESSION['login_establishment_id'] ?>">
+                                        value="<?php echo $_SESSION[
+                                            "login_establishment_id"
+                                        ]; ?>">
                                 </div>
                                 <!-- ETO YUNG STUDENT INFO -->
 
@@ -509,35 +531,33 @@ if ($_SESSION['login_type'] == 1) {
                                 </script>
                         </div>
                     </div>
-                <?php endif ?>
+                <?php endif; ?>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script>
 
-                    $('#manage-records').submit(function (e) {
-                        e.preventDefault();
-                        $.ajax({
-                            url: 'ajax.php?action=save_track',
-                            data: new FormData($(this)[0]),
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            method: 'POST',
-                            success: function (resp) {
-                                resp = JSON.parse(resp);
-                                if (resp.status == 1) {
-                                    // Save student ID to localStorage before reload
-                                    const studentId = $('#student_id').val().trim();
-                                    // sessionStorage.setItem('last_student_id', studentId);
+                $('#manage-records').submit(function (e) {
+                    e.preventDefault();
+                    $.ajax({
+                        url: 'ajax.php?action=save_track',
+                        data: new FormData($(this)[0]),
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        method: 'POST',
+                        success: function (resp) {
+                            resp = JSON.parse(resp);
+                            if (resp.status == 1) {
+                                const studentId = $('#student_id').val().trim();
 
-                                    alert_toast("Data successfully saved", 'success');
-                                    setTimeout(() => {
-                                    }, 300);
-                                    window.location.reload(); // Your existing reload logic
-                                }
+                                alert_toast("Data successfully saved", 'success');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1500); // 1.5 seconds delay to see the toast
                             }
-                        });
+                        }
                     });
+                });
 
 
                     $('#manage_visitor').click(function () {
@@ -560,7 +580,7 @@ if ($_SESSION['login_type'] == 1) {
                     function resetTimer() {
                         clearTimeout(inactivityTimer);
                         hideSplash();
-                        inactivityTimer = setTimeout(showSplash, 20000); // 30 sec
+                        inactivityTimer = setTimeout(showSplash, 60000); // 30 sec
                     }
 
                     function showSplash() {
@@ -693,10 +713,6 @@ if ($_SESSION['login_type'] == 1) {
                         });
                     });
 
-
-
-
-
                     function delete_logs($id) {
                         start_load()
                         $.ajax({
@@ -789,10 +805,14 @@ if ($_SESSION['login_type'] == 1) {
                             const courseChart = new Chart(document.getElementById('courseChart'), {
                                 type: 'doughnut',
                                 data: {
-                                    labels: <?= json_encode(array_column($courses, 'course')) ?>,
+                                    labels: <?= json_encode(
+                                        array_column($courses, "course")
+                                    ) ?>,
                                     datasets: [{
                                         label: 'Students',
-                                        data: <?= json_encode(array_column($courses, 'count')) ?>,
+                                        data: <?= json_encode(
+                                            array_column($courses, "count")
+                                        ) ?>,
                                         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4bc0c0', '#9966ff'],
                                     }]
                                 },
@@ -820,10 +840,14 @@ if ($_SESSION['login_type'] == 1) {
                             const estabChart = new Chart(document.getElementById('estabChart'), {
                                 type: 'bar',
                                 data: {
-                                    labels: <?= json_encode(array_column($estabs, 'est_name')) ?>,
+                                    labels: <?= json_encode(
+                                        array_column($estabs, "est_name")
+                                    ) ?>,
                                     datasets: [{
                                         label: 'Entries',
-                                        data: <?= json_encode(array_column($estabs, 'total')) ?>,
+                                        data: <?= json_encode(
+                                            array_column($estabs, "total")
+                                        ) ?>,
                                         backgroundColor: '#28a745'
                                     }]
                                 }
@@ -835,13 +859,20 @@ if ($_SESSION['login_type'] == 1) {
                             const dailyChart = new Chart(document.getElementById('dailyChart'), {
                                 type: 'bar',
                                 data: {
-                                    labels: <?= json_encode(array_map(function ($h) {
-                                        return date('g A', mktime($h['date']));
-                                    }, $daily)) ?>,
+                                    labels: <?= json_encode(
+                                        array_map(function ($h) {
+                                            return date(
+                                                "g A",
+                                                mktime($h["date"])
+                                            );
+                                        }, $daily)
+                                    ) ?>,
 
                                     datasets: [{
                                         label: 'Entries',
-                                        data: <?= json_encode(array_column($daily, 'total')) ?>,
+                                        data: <?= json_encode(
+                                            array_column($daily, "total")
+                                        ) ?>,
                                         borderColor: '#17a2b8',
                                         backgroundColor: 'rgba(23, 162, 184, 0.1)',
                                         borderWidth: 2,
@@ -869,18 +900,45 @@ if ($_SESSION['login_type'] == 1) {
                         }
 
                         // Weekly Chart
-                        if (document.getElementById('weeklyChart')) {
-                            const weeklyChart = new Chart(document.getElementById('weeklyChart'), {
+                        // Combined Time Period Chart
+                        if (document.getElementById('timePeriodChart')) {
+                            const timePeriodChartCtx = document.getElementById('timePeriodChart').getContext('2d');
+
+                            // Prepare data for each time period
+                            const timePeriodData = {
+                                weekly: {
+                                    labels: <?= json_encode(array_map(function ($d) { return date("D, M j", strtotime($d["date"])); }, $weekly)) ?>,
+                                    data: <?= json_encode(array_column($weekly, "total")) ?>,
+                                    label: 'Weekly Entries',
+                                    borderColor: '#ffc107',
+                                    backgroundColor: 'rgba(255, 193, 7, 0.1)'
+                                },
+                                monthly: {
+                                    labels: <?= json_encode(array_column($monthly, "month")) ?>,
+                                    data: <?= json_encode(array_column($monthly, "total")) ?>,
+                                    label: 'Monthly Entries',
+                                    borderColor: '#dc3545',
+                                    backgroundColor: 'rgba(220, 53, 69, 0.1)'
+                                },
+                                yearly: {
+                                    labels: <?= json_encode(array_column($yearly, "year")) ?>,
+                                    data: <?= json_encode(array_column($yearly, "total")) ?>,
+                                    label: 'Yearly Entries',
+                                    borderColor: '#17a2b8',
+                                    backgroundColor: 'rgba(23, 162, 184, 0.1)'
+                                }
+                            };
+
+                            // Create the initial chart (weekly by default)
+                            const timePeriodChart = new Chart(timePeriodChartCtx, {
                                 type: 'line',
                                 data: {
-                                    labels: <?= json_encode(array_map(function ($d) {
-                                        return date('D, M j', strtotime($d['date']));
-                                    }, $weekly)) ?>,
+                                    labels: timePeriodData.weekly.labels,
                                     datasets: [{
-                                        label: 'Entries',
-                                        data: <?= json_encode(array_column($weekly, 'total')) ?>,
-                                        borderColor: '#ffc107',
-                                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                        label: timePeriodData.weekly.label,
+                                        data: timePeriodData.weekly.data,
+                                        borderColor: timePeriodData.weekly.borderColor,
+                                        backgroundColor: timePeriodData.weekly.backgroundColor,
                                         borderWidth: 2,
                                         fill: true
                                     }]
@@ -903,69 +961,26 @@ if ($_SESSION['login_type'] == 1) {
                                     }
                                 }
                             });
-                        }
 
-                        // Monthly Chart
-                        if (document.getElementById('monthlyChart')) {
-                            const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
-                                type: 'bar',
-                                data: {
-                                    labels: <?= json_encode(array_column($monthly, 'month')) ?>,
-                                    datasets: [{
-                                        label: 'Entries',
-                                        data: <?= json_encode(array_column($monthly, 'total')) ?>,
-                                        borderColor: '#dc3545',
-                                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                                        borderWidth: 2,
-                                        fill: true
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: 'Monthly Entries'
-                                        }
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true
-                                        }
-                                    }
-                                }
-                            });
-                        }
+                            // Handle time period selection change
+                            document.getElementById('timePeriodSelect').addEventListener('change', function() {
+                                const selectedPeriod = this.value;
+                                const periodData = timePeriodData[selectedPeriod];
 
-                        // yearly Chart
-                        if (document.getElementById('yearlyChart')) {
-                            const yearlyChart = new Chart(document.getElementById('yearlyChart'), {
-                                type: 'bar',
-                                data: {
-                                    labels: <?= json_encode(array_column($yearly, 'year')) ?>,
-                                    datasets: [{
-                                        label: 'Entries',
-                                        data: <?= json_encode(array_column($yearly, 'total')) ?>,
-                                        borderColor: '#17a2b8',
-                                        backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                                        borderWidth: 2,
-                                        fill: true
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: 'Yearly Entries'
-                                        }
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true
-                                        }
-                                    }
-                                }
+                                // Update chart data
+                                timePeriodChart.data.labels = periodData.labels;
+                                timePeriodChart.data.datasets[0].data = periodData.data;
+                                timePeriodChart.data.datasets[0].label = periodData.label;
+                                timePeriodChart.data.datasets[0].borderColor = periodData.borderColor;
+                                timePeriodChart.data.datasets[0].backgroundColor = periodData.backgroundColor;
+
+                                // Update chart title
+                                timePeriodChart.options.plugins.title.text = periodData.label;
+
+                                // Update chart type (bar for monthly/yearly, line for weekly)
+                                timePeriodChart.config.type = selectedPeriod === 'weekly' ? 'line' : 'bar';
+
+                                timePeriodChart.update();
                             });
                         }
 

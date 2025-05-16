@@ -28,7 +28,7 @@
 <!-- Template Main CSS File -->
 
 <link type="text/css" rel="stylesheet" href="assets/css/jquery-te-1.4.0.css">
-<link rel="stylesheet" href="home.css">
+
 
 
 <script src="assets/vendor/jquery/jquery.min.js"></script>

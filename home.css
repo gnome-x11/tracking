@@ -128,7 +128,7 @@ html::-webkit-scrollbar {
 
 .tracking-form {
     max-width: 700px;
-    max-height: 650px;
+    max-height: 1000px;
     margin: 30px auto;
     padding: 20px;
     background: white;
@@ -193,10 +193,48 @@ span.float-right.summary_icon {
     font-size: 1.1rem;
     padding: 1rem 1.25rem;
     margin-bottom: 30px;
+    color: white;
 }
 
-.dashboard-card-body {
-    padding: 20px;
+.welcome-message {
+    font-size: 10px; /* Adjust this to your desired size */
+    line-height: 2;
+    text-align: center;
+    padding: 10px;
+}
+
+.welcome-message {
+    font-size: 10px;
+    line-height: 1.4;
+    text-align: center;
+    padding: 10px;
+}
+
+.card-body-title {
+    margin: 5px 0;
+    font-weight: normal;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    opacity: 20%;
+    text-align: center;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+/* Tighter spacing between welcome and entering lines */
+.welcome-message .welcome-heading {
+    margin-bottom: 2px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.welcome-message .entering-text {
+    margin-top: 0;
+    margin-bottom: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    color: green;
 }
 
 .toast {
@@ -238,18 +276,6 @@ span.float-right.summary_icon {
 .back-to-top i:hover {
     background: #1c84e3;
     color: #fff;
-}
-
-.tracking-form {
-    padding: 50px;
-    border: 1.2px solid black;
-}
-
-.card-body-title {
-    font-weight: bold;
-    font-size: 20px;
-    text-align: center;
-    margin-bottom: 50px;
 }
 
 .card-logo-plmun {

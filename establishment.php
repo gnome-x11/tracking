@@ -5,7 +5,7 @@ include 'db_connect.php'; ?>
 	/* General Styles */
 	body {
 		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		background-color: white;
+		background-color: #333;
 		color: #212529;
 
 	}
@@ -80,7 +80,7 @@ include 'db_connect.php'; ?>
 	th, td {
 		padding: 0.75rem;
 		border-bottom: 1px solidrgb(75, 238, 91);
-		
+
 	}
 
 	th {
@@ -88,7 +88,7 @@ include 'db_connect.php'; ?>
 		font-weight: 600;
 		text-align: left;
 		color: white;
-		
+
 	}
 
 	.table-responsive {
@@ -292,7 +292,7 @@ include 'db_connect.php'; ?>
 
 	img {
 		max-width: 100px;
-		max-height: :150px;
+		max-height: 150px;
 	}
 </style>
 <script>

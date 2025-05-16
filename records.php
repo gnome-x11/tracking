@@ -1,4 +1,4 @@
-<?php 
+<?php
 include 'db_connect.php'; ?>
 
 <div class="container-fluid">
@@ -7,7 +7,7 @@ include 'db_connect.php'; ?>
 	/* General Styles */
 	body {
 		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		background-color: white;
+		background-color: #333;
 		color: #212529;
 
 	}
@@ -82,7 +82,7 @@ include 'db_connect.php'; ?>
 	th, td {
 		padding: 0.75rem;
 		border-bottom: 1px solidrgb(75, 238, 91);
-		
+
 	}
 
 	th {
@@ -90,7 +90,7 @@ include 'db_connect.php'; ?>
 		font-weight: 600;
 		text-align: left;
 		color: white;
-		
+
 	}
 
 	.table-responsive {
@@ -281,17 +281,17 @@ include 'db_connect.php'; ?>
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
 									$tracks = $conn->query(
-										"SELECT 
-												t.*,concat(p.lastname,', ',p.firstname,' ',p.middlename) as name, 
+										"SELECT
+												t.*,concat(p.lastname,', ',p.firstname,' ',p.middlename) as name,
 												p.college,
 												p.course,
 												p.year_level,
 												p.standing,
 
-												e.name as ename,p.student_id 
-												FROM person_tracks t 
-												inner join persons p on p.id = t.person_id 
-												inner join establishments e on e.id = t.establishment_id 
+												e.name as ename,p.student_id
+												FROM person_tracks t
+												inner join persons p on p.id = t.person_id
+												inner join establishments e on e.id = t.establishment_id
 												where date(t.date_created) between '$from' and '$to' $ewhere order by t.id desc"
 									);
 
@@ -326,7 +326,7 @@ include 'db_connect.php'; ?>
 												<p> <?php echo ucwords($row['ename']) ?></p>
 											</td>
 
-											
+
 
 
 											<td class="text-center">
@@ -362,7 +362,7 @@ include 'db_connect.php'; ?>
 
 	img {
 		max-width: 100px;
-		max-height: :150px;
+		max-height: 150px;
 	}
 </style>
 <script>
