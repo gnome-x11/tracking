@@ -22,8 +22,6 @@
 <?php
 session_start(); // Make sure the session is started
 
-$establishment_id = isset($_SESSION['establishment_id']) ? $_SESSION['establishment_id'] : 0;
-
 include 'db_connect.php';
 
 
@@ -63,7 +61,8 @@ if (isset($_GET['id'])) {
 				<label class="control-label">Purpose</label>
 				<textarea name="purpose" class="form-control" rows="3" required><?php echo isset($purpose) ? $purpose : '' ?></textarea>
 			</div>
-			<input type="hidden" name="establishment_id" value="<?php echo isset($establishment_id) ? $establishment_id : '' ?>">
+			<input type="hidden" name="establishment_id"
+				value="<?php echo isset($establishment_id) ? $establishment_id : $_SESSION['login_establishment_id'] ?>">
 			<input type="hidden" name="created_at" value="<?= date('Y-m-d H:i:s') ?>">
 
 		</div>
@@ -109,4 +108,3 @@ if (isset($_GET['id'])) {
 		});
 	});
 </script>
- 

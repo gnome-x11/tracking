@@ -261,14 +261,14 @@ include 'db_connect.php'; ?>
 								<thead>
 									<tr>
 										<th class="text-center">#</th>
-										<th class="">Date</th>
-										<th class="">Student Number</th>
-										<th class="">Name</th>
-										<th class="">College</th>
-										<th class="">Course</th>
-										<th class="">Year</th>
-										<th class="">Standing</th>
-										<th class="">Establishment</th>
+										<th class="">Visitor ID</th>
+										<th class="">Full Name</th>
+										<th class="">Email</th>
+										<th class="">Purposse</th>
+										<th class="">Date></th>
+										<th class="">Time - in</th>
+										<th class="">Time - out</th>
+										<th class="">Entered In</th>
 										<th class="text-center">Action</th>
 									</tr>
 								</thead>
@@ -280,59 +280,62 @@ include 'db_connect.php'; ?>
 									$ewhere = '';
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
-									$tracks = $conn->query(
-										"SELECT
-												t.*,concat(p.lastname,', ',p.firstname,' ',p.middlename) as name,
-												p.college,
-												p.course,
-												p.year_level,
-												p.standing,
+                                        $tracks = $conn->query(
+                                            "SELECT
+                                                v.visitor_id,
+                                                v.full_name,
+                                                v.contact_number,
+                                                v.email,
+                                                v.purpose,
+                                                v.establishment_id as v_establishment_id,
+                                                v.created_at,
+                                                v.token,
+                                                v.token_expiry,
+                                                l.log_id,
+                                                l.establishment_id as establishment_id,
+                                                l.time_in,
+                                                l.time_out
+                                            FROM visitors v
+                                            INNER JOIN visitor_logs l ON v.visitor_id = l.visitor_id
+                                            WHERE date(v.created_at) BETWEEN '{$from}' AND '{$to}' $ewhere
+                                            ORDER BY v.created_at DESC"
+                                        );
 
-												e.name as ename,p.student_id
-												FROM person_tracks t
-												inner join persons p on p.id = t.person_id
-												inner join establishments e on e.id = t.establishment_id
-												where date(t.date_created) between '$from' and '$to' $ewhere order by t.id desc"
-									);
 
 									while ($row = $tracks->fetch_assoc()):
 										?>
 										<tr>
 
 											<td class="text-center"><?php echo $i++ ?></td>
-											<td class="">
-												<p> <?php echo date("M d,Y h:i A", strtotime($row['date_created'])) ?></b>
-												</p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['student_id'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo ucwords($row['name']) ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['college'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['course'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['year_level'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['standing'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo ucwords($row['ename']) ?></p>
-											</td>
 
-
-
-
+											<td class="">
+												<p> <?php echo $row['visitor_id'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo ucwords($row['full_name']) ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['email'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['purpose'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['created_at'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['time_in'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo ucwords($row['time_out']) ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo ucwords($row['establishment_id']) ?></p>
+											</td>
 											<td class="text-center">
 												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
 
-													<button class="btn btn-sm btn-outline-danger delete_records"
+													<button class="btn btn-sm btn-outline-danger delete_visitor"
 														type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
 												</div>
 											</td>
@@ -365,62 +368,15 @@ include 'db_connect.php'; ?>
 	}
 </style>
 <script>
-	$(document).ready(function () {
-		$('table').dataTable()
-	})
-	$('#new_records').click(function () {
-		uni_modal("New Record", "manage_records.php")
-	})
 
-	$('.edit_records').click(function () {
-		uni_modal("Edit Record", "manage_records.php?id=" + $(this).attr('data-id'), "mid-large")
-
-	})
-	$('.delete_records').click(function () {
-		_conf("Are you sure to delete this Person?", "delete_records", [$(this).attr('data-id')])
-	})
-	$('#check_all').click(function () {
-		if ($(this).prop('checked') == true)
-			$('[name="checked[]"]').prop('checked', true)
-		else
-			$('[name="checked[]"]').prop('checked', false)
-	})
-	$('[name="checked[]"]').click(function () {
-		var count = $('[name="checked[]"]').length
-		var checked = $('[name="checked[]"]:checked').length
-		if (count == checked)
-			$('#check_all').prop('checked', true)
-		else
-			$('#check_all').prop('checked', false)
-	})
-	$('#print').click(function () {
-		start_load()
-		$.ajax({
-			url: "print_records.php",
-			method: "POST",
-			data: { from: '<?php echo $from ?>', to: "<?php echo $to ?>" },
-			success: function (resp) {
-				if (resp) {
-					var nw = window.open("", "_blank", "height=600,width=900")
-					nw.document.write(resp)
-					nw.document.close()
-					nw.print()
-					setTimeout(function () {
-						nw.close()
-						end_load()
-					}, 700)
-				}
-			}
-		})
-	})
 	$('#filter').click(function () {
-		location.replace("index.php?page=records&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
+		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
 
-	function delete_records($id) {
+	function delete_visitor($id) {
 		start_load()
 		$.ajax({
-			url: 'ajax.php?action=delete_records',
+			url: 'ajax.php?action=delete_visitor',
 			method: 'POST',
 			data: { id: $id },
 			success: function (resp) {

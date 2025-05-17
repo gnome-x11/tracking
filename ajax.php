@@ -42,6 +42,11 @@ if($action == 'scan_visitor'){
     if($save)
         echo $save;
 }
+if ($action == 'delete_visitor'){
+    $save = $crud->delete_visitor();
+    if ($save)
+        echo $save;
+}
 
 if($action == 'delete_user'){
 	$save = $crud->delete_user();

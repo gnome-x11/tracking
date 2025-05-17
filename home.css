@@ -33,6 +33,17 @@ html::-webkit-scrollbar {
     /* Chrome/Safari/Opera */
 }
 
+/* Add to your CSS */
+.chart-container {
+    position: relative;
+    height: 400px; /* Fixed height for all charts */
+    min-width: 100%;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
 .dashboard-container {
     padding: 20px;
     max-width: 90%;

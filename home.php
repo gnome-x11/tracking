@@ -12,7 +12,7 @@ if (isset($_SESSION["invalid_attempts"]) && $_SESSION["invalid_attempts"] >= 3) 
 
 $total_visitors_today = $conn->query("SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()")->fetch_assoc()["total"];
 $total_establishments = $conn->query("SELECT COUNT(*) as total FROM establishments")->fetch_assoc()["total"];
-$total_students = $conn->query("SELECT COUNT(*) as total FROM persons")->fetch_assoc()["total"];
+$total_visitors = $conn->query("SELECT COUNT(*) as total FROM visitors")->fetch_assoc()["total"];
 $total_staff = $conn->query("SELECT COUNT(*) as total FROM users WHERE type = 2")->fetch_assoc()["total"];
 
 $college_course = [];
@@ -87,29 +87,6 @@ while ($row = $hourly_query->fetch_assoc()) {
       $hourly[] = $row;
 }
 
-$perPage = 5;
-$page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
-$offset = ($page - 1) * $perPage;
-$totalQuery = $conn->query("SELECT COUNT(*) as total FROM failed_login_attempts");
-$totalRow = $totalQuery->fetch_assoc();
-$totalResults = $totalRow["total"];
-$totalPages = ceil($totalResults / $perPage);
-
-$failed_attempts = [];
-if ($_SESSION["login_type"] == 1) {
-      $user_id = $_SESSION["login_id"];
-      $query = $conn->query("
-        SELECT f.date_created, e.name as establishment, f.error_message
-        FROM failed_login_attempts f
-        JOIN establishments e ON f.establishment_id = e.id
-        ORDER BY f.date_created DESC
-        LIMIT $offset, $perPage
-    ");
-
-      while ($row = $query->fetch_assoc()) {
-            $failed_attempts[] = $row;
-      }
-}
 ?>
 
 
@@ -143,6 +120,8 @@ if ($_SESSION["login_type"] == 1) {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+
+            background-color: white;
         }
     </style>
 
@@ -161,113 +140,51 @@ if ($_SESSION["login_type"] == 1) {
         <?php if ($_SESSION["login_type"] == 1): ?>
             <!-- Statistics Cards -->
                 <div class="card-header dashboard-card-header">
-                    <b style="color: white; font-size: 30px;">Dashboard and Analytics</b>
+                    <b style="color: white; font-size: 30px;">Dashboard and Analytics</b><br><br><br>
                 </div>
 
                     <div class="row">
                         <div class="col-md-3">
-                            <div class="stat-card visitors">
-                                <span class="float-right summary_icon"><i class="fa fa-users"></i></span>
-                                <div class="stat-value"><?php echo $total_visitors_today; ?></div>
-                                <div class="stat-label">Total Visitors Today</div>
-                            </div>
+                            <a href="index.php?page=records" style="text-decoration: none; color: inherit;">
+                                <div class="stat-card visitors" style="cursor: pointer;">
+                                    <span class="float-right summary_icon"><i class="fa fa-users"></i></span>
+                                    <div class="stat-value"><?php echo $total_visitors_today; ?></div>
+                                    <div class="stat-label">Total Student Entered Today</div>
+                                </div>
+                            </a>
                         </div>
 
                         <div class="col-md-3">
-                            <div class="stat-card establishments">
+                            <a href="index.php?page=establishment" style="text-decoration: none; color: inherit;"><div class="stat-card establishments">
                                 <span class="float-right summary_icon"><i class="fa fa-building"></i></span>
                                 <div class="stat-value"><?php echo $total_establishments; ?></div>
                                 <div class="stat-label">Total Establishments</div>
                             </div>
+                            </a>
                         </div>
 
                         <div class="col-md-3">
+                            <a href="index.php?page=visitor" style="text-decoration: none; color: inherit;">
                             <div class="stat-card students">
                                 <span class="float-right summary_icon"><i class="fa fa-graduation-cap"></i></span>
-                                <div class="stat-value"><?php echo $total_students; ?></div>
-                                <div class="stat-label">Total Students</div>
+                                <div class="stat-value"><?php echo $total_visitors; ?></div>
+                                <div class="stat-label">Total Visitors Today</div>
                             </div>
+                            </a>
                         </div>
 
                         <div class="col-md-3">
+                            <a href="index.php?page=users" style="text-decoration: none; color: inherit;">
                             <div class="stat-card staff">
                                 <span class="float-right summary_icon"><i class="fa fa-user"></i></span>
                                 <div class="stat-value"><?php echo $total_staff; ?></div>
                                 <div class="stat-label">Total Staff</div>
                             </div>
+                            </a>
                         </div>
                     </div>
 
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-header bg-transparent border-0 py-3 px-4 d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-shield-lock text-danger fs-5"></i>
-                                        <h5 class="mb-0 fw-semibold text-dark">Failed Login Attempts</h5>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" type="button"
-                                        data-id="<?php echo $row["id"]; ?>">
-                                        <i class="bi bi-trash3"></i> Clear Logs
-                                    </button>
-                                </div>
 
-                                <div class="card-body px-4 pb-4">
-                                    <?php if (count($failed_attempts) > 0): ?>
-                                        <div class="table-responsive">
-                                            <table class="table table-hover align-middle">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th class="text-muted small">Date</th>
-                                                        <th class="text-muted small">Establishment</th>
-                                                        <th class="text-muted small">Error</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($failed_attempts as $attempt): ?>
-                                                        <tr>
-                                                            <td><?php echo $attempt["date_created"]; ?></td>
-                                                            <td><?php echo $attempt["establishment"]; ?></td>
-                                                            <td><?php echo $attempt["error_message"]; ?></td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                        <!-- Pagination -->
-                                        <?php if ($totalPages > 1): ?>
-                                            <nav class="mt-4">
-                                                <ul class="pagination justify-content-center mb-0">
-                                                    <?php if ($page > 1): ?>
-                                                        <li class="page-item">
-                                                            <a class="page-link" href="?page=<?php echo $page - 1; ?>">&laquo;</a>
-                                                        </li>
-                                                    <?php endif; ?>
-
-                                                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                                        </li>
-                                                    <?php endfor; ?>
-
-                                                    <?php if ($page < $totalPages): ?>
-                                                        <li class="page-item">
-                                                            <a class="page-link" href="?page=<?php echo $page + 1; ?>">&raquo;</a>
-                                                        </li>
-                                                    <?php endif; ?>
-                                                </ul>
-                                            </nav>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <div class="alert alert-success mb-0" role="alert">
-                                            No failed login attempts found.
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
 
                     <!-- Charts Section -->
@@ -312,12 +229,83 @@ if ($_SESSION["login_type"] == 1) {
                                     </select>
                                 </div>
                                 <div class="card-body">
-                                    <canvas id="timePeriodChart"></canvas>
+                                    <canvas id="timePeriodChart" ></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Add this code in the admin section where you want the table to appear -->
+                    <div class="row mt-5">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                    <span>Failed Login Attempts</span>
+                                    <button class="btn btn-light btn-sm text-danger delete_records" data-id="all">Clear Logs</button>
+                                </div>
+
+
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="failedLoginsTable" class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Establishment</th>
+                                                    <th>Error Message</th>
+                                                    <th>Date/Time</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $failed_logins = [];
+                                                $failed_query = $conn->query("
+                                                    SELECT f.id, f.establishment_id, e.name AS establishment_name, f.error_message, f.date_created
+                                                    FROM failed_login_attempts f
+                                                    LEFT JOIN establishments e ON f.establishment_id = e.id
+                                                    ORDER BY f.date_created DESC
+                                                ");
+                                                while ($row = $failed_query->fetch_assoc()) {
+                                                    $failed_logins[] = $row;
+                                                }
+
+
+                                                if(count($failed_logins) > 0):
+                                                    foreach($failed_logins as $login): ?>
+                                                    <tr>
+                                                        <td><?php echo $login['id'] ?></td>
+                                                        <td><?php echo htmlspecialchars($login['establishment_name'] ?? 'Unknown') ?></td>
+                                                        <td><?php echo htmlspecialchars($login['error_message']) ?></td>
+                                                        <td><?php echo date("M d, Y h:i A", strtotime($login['date_created'])) ?></td>
+                                                    </tr>
+
+                                                <?php endforeach;
+                                                else: ?>
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">No failed login attempts found</td>
+                                                    </tr>
+                                                <?php endif; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- DataTables Initialization -->
+                    <script>
+                        $(document).ready(function () {
+                            $('#failedLoginsTable').DataTable({
+                                "pageLength": 5,
+                                "lengthChange": false, // hide the 'show x entries' dropdown
+                            });
+                        });
+                    </script>
+                    </div>
+
         <?php endif; ?>
+
 
         <!-- end of admin side -->
     </main>
@@ -475,7 +463,6 @@ if ($_SESSION["login_type"] == 1) {
                                         </div>
                                     </div>
                                 </div>
-
                         </div>
                     </div>
                 <?php endif; ?>
@@ -647,7 +634,7 @@ if ($_SESSION["login_type"] == 1) {
                                 try {
                                     const result = JSON.parse(resp);
                                     if (result.status === "success") {
-                                        let actionText = result.action === 'time_in' ? "Visitor logged IN" : "Visitor logged OUT";
+                                        let actionText = result.action === 'time_in' ? "Visitor Time-in Recorded" : "Visitor Time-out Recorded"; //palitan mo nalang to ubos na english ko HAHA
                                         alert_toast(actionText, 'success');
                                     } else {
                                         alert_toast(result.message || "Invalid visitor token", 'danger');
@@ -667,10 +654,6 @@ if ($_SESSION["login_type"] == 1) {
                             $('#student_id').val('');
                         }, 2000);
                     }
-
-
-
-
 
                     document.addEventListener('DOMContentLoaded', function () {
                         const sidebar = document.getElementById('sidebar');
@@ -708,23 +691,6 @@ if ($_SESSION["login_type"] == 1) {
                         });
                     });
 
-                    function delete_logs($id) {
-                        start_load()
-                        $.ajax({
-                            url: 'ajax.php?action=delete_logs',
-                            method: 'POST',
-                            data: { id: $id },
-                            success: function (resp) {
-                                if (resp == 1) {
-                                    alert_toast("Data successfully deleted", 'danger')
-                                    setTimeout(function () {
-                                        location.reload()
-                                    }, 1500)
-
-                                }
-                            }
-                        })
-                    }
 
 
                     function get_person() {
@@ -771,8 +737,12 @@ if ($_SESSION["login_type"] == 1) {
                         $('#studentCard').hide()
                     }
 
+                    </script>
 
-                    //ito naman yung mga graph ng charts adjust mo nalang kung gusto mo sa chart.js
+
+                    <!-- //ito naman yung mga graph ng charts adjust mo nalang kung gusto mo sa chart.js -->
+<script>
+
 
                     document.addEventListener('DOMContentLoaded', function () {
                         // College & Course Chart
@@ -791,8 +761,6 @@ if ($_SESSION["login_type"] == 1) {
                                     backgroundColor: `hsl(${Math.random() * 360}, 60%, 70%)`
                                 };
                             });
-
-
                         }
 
                         // Course Donut Chart
@@ -813,7 +781,7 @@ if ($_SESSION["login_type"] == 1) {
                                     plugins: {
                                         legend: {
                                             display: true,
-                                            position: 'left',
+                                            position: 'bottom',
                                             align: 'center'
                                         },
                                         title: {
@@ -824,7 +792,6 @@ if ($_SESSION["login_type"] == 1) {
                                 }
                             });
                         }
-
 
                         // Establishment Chart
                         if (document.getElementById('estabChart')) {
@@ -989,6 +956,38 @@ if ($_SESSION["login_type"] == 1) {
                             $('#student_id').focus();
                         }
                     });
+
+                    // Confirmation dialog function
+                      function _conf(message, callback, args = []) {
+                          if (confirm(message)) {
+                              if (typeof window[callback] === "function") {
+                                  window[callback](...args);
+                              }
+                          }
+                      }
+
+                      // Handle button click and call _conf
+                      $('.delete_records').click(function () {
+                          _conf("Are you sure you want to clear all logs?", "delete_records", [$(this).attr('data-id')]);
+                      });
+
+                      // Actual deletion logic via AJAX
+                      function delete_records(id) {
+                          if (id === "all") {
+                              $.ajax({
+                                  url: "ajax/clear_failed_logs.php",
+                                  method: "POST",
+                                  data: { action: "clear_all" },
+                                  success: function (res) {
+                                      alert("All logs cleared successfully!");
+                                      location.reload();
+                                  },
+                                  error: function () {
+                                      alert("Failed to clear logs. Please try again.");
+                                  }
+                              });
+                          }
+                      }
                 </script>
 </body>
 
