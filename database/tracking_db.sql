@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 25, 2025 at 06:35 PM
+-- Generation Time: May 17, 2025 at 09:38 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -61,7 +61,32 @@ CREATE TABLE `failed_login_attempts` (
 --
 
 INSERT INTO `failed_login_attempts` (`id`, `establishment_id`, `error_message`, `date_created`) VALUES
-(8, 8, 'Invalid credential', '2025-04-25 20:53:13');
+(11, 8, 'Invalid credential', '2025-04-26 14:38:53'),
+(12, 8, 'Invalid credential', '2025-04-26 14:38:53'),
+(13, 8, 'Invalid credential', '2025-04-26 14:38:53'),
+(14, 8, 'Invalid credential', '2025-04-26 14:38:53'),
+(15, 8, 'Invalid credential', '2025-04-26 14:38:53'),
+(16, 8, 'Invalid credential', '2025-04-26 14:39:02'),
+(17, 8, 'Invalid credential', '2025-04-26 14:39:02'),
+(18, 8, 'Invalid credential', '2025-04-26 14:39:02'),
+(19, 8, 'Invalid credential', '2025-04-26 14:39:02'),
+(20, 8, 'Invalid credential', '2025-04-26 14:39:02'),
+(21, 8, 'Invalid credential', '2025-05-15 22:06:22'),
+(22, 8, 'Invalid credential', '2025-05-17 00:18:48'),
+(23, 8, 'Invalid credential', '2025-05-17 00:30:49'),
+(24, 8, 'Invalid credential', '2025-05-17 01:40:00'),
+(25, 8, 'Invalid credential', '2025-05-17 09:39:09'),
+(26, 8, 'Invalid credential', '2025-05-17 11:41:37'),
+(27, 8, 'Invalid credential', '2025-05-17 11:56:05'),
+(28, 8, 'Invalid credential', '2025-05-17 14:00:21'),
+(30, 8, 'Invalid credential', '2025-05-17 15:16:05'),
+(31, 8, 'Invalid credential', '2025-05-17 15:16:11'),
+(32, 8, 'Invalid credential', '2025-05-17 15:16:21'),
+(33, 8, 'Invalid credential', '2025-05-17 15:19:36'),
+(34, 8, 'Invalid credential', '2025-05-17 15:19:51'),
+(35, 8, 'Invalid credential', '2025-05-17 15:21:02'),
+(36, 8, 'Invalid credential', '2025-05-17 15:26:33'),
+(37, 8, 'Invalid credential', '2025-05-17 15:26:40');
 
 -- --------------------------------------------------------
 
@@ -112,7 +137,8 @@ INSERT INTO `persons` (`id`, `firstname`, `middlename`, `lastname`, `student_id`
 (17, 'Nigga', '', 'Obama', 21239315, '3434', 'Washington DC', '', '', 'Washington DC', '', '1745563075_obama.jpeg', 3, 'IRREGULAR', 'CITCS', 'BS Information Technology'),
 (18, 'Sarah', '', 'Zimerman', 21239316, '23423', 'Malacanang Palace', '', '', 'Metro Manila', '', '1745563137_sarah.jpg', 2, 'REGULAR', 'CTE', 'BSEd - English'),
 (19, 'Trump', '', 'Donald ', 21239317, '24242', 'tarif them again street', '', 'Washington', 'USA', '', '1745563196_trump.jpg', 2, 'REGULAR', 'CITCS', 'BS Information Technology'),
-(20, 'wqer', 'wqer', 'qwer', 21239200, 'qwer', 'wer', 'qwer', 'qwer', 'qwer', 'qwer', '1745563446_Screenshot 2025-04-19 at 6.12.11 PM.png', 1, 'IRREGULAR', 'CBA', 'BSBA - HRDM');
+(20, 'wqer', 'wqer', 'qwer', 21239200, 'qwer', 'wer', 'qwer', 'qwer', 'qwer', 'qwer', '1745563446_Screenshot 2025-04-19 at 6.12.11 PM.png', 1, 'IRREGULAR', 'CBA', 'BSBA - HRDM'),
+(21, 'Angelo', 'Vallente', 'Mendoza', 21239240, '1', '1', '1', '1', '1', '1', '1745649658_ChatGPT Image Apr 18, 2025, 10_23_37 PM_upscayl_4x_digital-art-4x.png', 4, 'REGULAR', 'CITCS', 'BS Information Technology');
 
 -- --------------------------------------------------------
 
@@ -140,7 +166,74 @@ INSERT INTO `person_tracks` (`id`, `person_id`, `establishment_id`, `date_create
 (21, 1, 8, '2025-04-25 20:52:25'),
 (22, 1, 8, '2025-04-25 20:53:05'),
 (23, 1, 8, '2025-04-25 21:07:21'),
-(24, 1, 8, '2025-04-25 22:52:34');
+(24, 1, 8, '2025-04-25 22:52:34'),
+(25, 2, 8, '2025-04-26 00:56:38'),
+(26, 9, 8, '2025-04-26 14:22:43'),
+(27, 9, 8, '2025-04-26 14:23:59'),
+(28, 17, 8, '2025-04-26 14:30:02'),
+(29, 1, 8, '2025-04-26 14:34:05'),
+(30, 1, 8, '2025-04-26 14:34:22'),
+(31, 17, 8, '2025-04-26 14:35:06'),
+(32, 17, 8, '2025-04-26 14:35:47'),
+(33, 17, 8, '2025-04-26 14:38:41'),
+(34, 17, 8, '2025-04-26 14:38:55'),
+(35, 17, 8, '2025-04-26 14:39:05'),
+(36, 17, 8, '2025-04-26 14:39:25'),
+(37, 21, 8, '2025-04-26 14:41:20'),
+(38, 21, 8, '2025-04-26 14:45:14'),
+(39, 21, 8, '2025-04-26 14:45:22'),
+(40, 21, 8, '2025-04-26 14:46:18'),
+(41, 21, 8, '2025-04-26 14:47:56'),
+(42, 21, 8, '2025-04-26 14:49:07'),
+(43, 21, 8, '2025-04-26 14:49:27'),
+(44, 21, 8, '2025-04-26 14:49:44'),
+(45, 21, 8, '2025-04-26 14:49:56'),
+(46, 21, 8, '2025-04-26 14:50:04'),
+(47, 21, 8, '2025-04-26 14:50:08'),
+(48, 21, 8, '2025-04-26 14:50:50'),
+(49, 21, 8, '2025-04-26 14:51:07'),
+(50, 21, 8, '2025-04-26 14:51:11'),
+(51, 21, 8, '2025-04-26 14:51:19'),
+(52, 21, 8, '2025-04-26 14:51:22'),
+(53, 21, 8, '2025-04-26 14:52:10'),
+(54, 21, 8, '2025-04-26 14:52:20'),
+(55, 21, 8, '2025-04-26 14:52:31'),
+(56, 21, 8, '2025-04-26 14:52:47'),
+(57, 21, 8, '2025-04-26 15:07:08'),
+(58, 21, 8, '2025-04-26 15:07:14'),
+(59, 21, 8, '2025-04-26 15:07:16'),
+(60, 21, 8, '2025-04-26 15:07:22'),
+(61, 21, 8, '2025-04-26 15:07:32'),
+(62, 21, 8, '2025-04-26 15:07:38'),
+(63, 21, 8, '2025-04-26 15:09:08'),
+(64, 21, 8, '2025-04-26 15:09:14'),
+(65, 21, 8, '2025-04-26 15:10:38'),
+(66, 21, 8, '2025-04-26 15:11:01'),
+(67, 21, 8, '2025-04-26 15:11:04'),
+(68, 17, 8, '2025-04-26 15:11:22'),
+(69, 21, 8, '2025-04-26 15:15:43'),
+(70, 21, 8, '2025-04-26 15:15:52'),
+(71, 17, 8, '2025-04-26 15:16:00'),
+(72, 21, 8, '2025-04-26 15:16:08'),
+(73, 21, 8, '2025-04-26 15:16:21'),
+(74, 21, 8, '2025-04-26 15:20:44'),
+(75, 21, 8, '2025-04-26 15:20:59'),
+(76, 21, 8, '2025-04-26 15:21:34'),
+(77, 21, 8, '2025-04-26 15:21:51'),
+(78, 1, 8, '2025-05-17 00:23:15'),
+(79, 1, 8, '2025-05-17 00:30:34'),
+(80, 1, 8, '2025-05-17 01:40:10'),
+(81, 1, 8, '2025-05-17 09:39:21'),
+(82, 1, 8, '2025-05-17 10:00:09'),
+(83, 1, 8, '2025-05-17 10:00:20'),
+(84, 1, 8, '2025-05-17 10:02:57'),
+(85, 1, 8, '2025-05-17 10:03:39'),
+(86, 1, 8, '2025-05-17 10:04:14'),
+(87, 1, 8, '2025-05-17 10:04:32'),
+(88, 1, 8, '2025-05-17 11:54:08'),
+(89, 1, 8, '2025-05-17 12:04:46'),
+(90, 1, 8, '2025-05-17 12:41:40'),
+(91, 1, 8, '2025-05-17 15:17:43');
 
 -- --------------------------------------------------------
 
@@ -167,6 +260,61 @@ INSERT INTO `users` (`id`, `name`, `type`, `username`, `password`, `establishmen
 (10, 'ELEVATOR ENTRANCE', 2, 'elevator_kiosk', '25f9e794323b453885f5181f1b624d0b', 7),
 (11, 'MAIN ENTRACE', 2, 'main_kiosk', '25f9e794323b453885f5181f1b624d0b', 2),
 (12, 'RLRC BUILDING ENTRACE', 2, 'rlrc_kiosk', '25f9e794323b453885f5181f1b624d0b', 8);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `visitors`
+--
+
+CREATE TABLE `visitors` (
+  `visitor_id` int(11) NOT NULL,
+  `full_name` varchar(50) NOT NULL,
+  `contact_number` varchar(11) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `purpose` text NOT NULL,
+  `establishment_id` int(25) NOT NULL,
+  `created_at` date NOT NULL,
+  `token` varchar(32) NOT NULL,
+  `token_expiry` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `visitors`
+--
+
+INSERT INTO `visitors` (`visitor_id`, `full_name`, `contact_number`, `email`, `purpose`, `establishment_id`, `created_at`, `token`, `token_expiry`) VALUES
+(191201, 'Dexter Aromin', '09128171470', 'chichayaromin76@gmail.com', 'ewrwerwerwer', 0, '2025-05-17', '4b706404127370be1278bddb139e4dd9', '2025-05-18 08:07:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `visitor_logs`
+--
+
+CREATE TABLE `visitor_logs` (
+  `log_id` int(11) NOT NULL,
+  `visitor_id` int(11) NOT NULL,
+  `establishment_id` int(11) NOT NULL,
+  `time_in` datetime NOT NULL,
+  `time_out` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `visitor_logs`
+--
+
+INSERT INTO `visitor_logs` (`log_id`, `visitor_id`, `establishment_id`, `time_in`, `time_out`) VALUES
+(1, 191201, 8, '2025-05-17 14:08:03', '2025-05-17 14:55:31'),
+(2, 191201, 8, '2025-05-17 15:04:45', '2025-05-17 15:05:05'),
+(3, 191201, 8, '2025-05-17 15:14:09', '2025-05-17 15:15:15'),
+(4, 191201, 8, '2025-05-17 15:16:11', '2025-05-17 15:16:21'),
+(5, 191201, 8, '2025-05-17 15:17:58', '2025-05-17 15:19:24'),
+(6, 191201, 8, '2025-05-17 15:19:36', '2025-05-17 15:19:51'),
+(7, 191201, 8, '2025-05-17 15:20:34', '2025-05-17 15:20:52'),
+(8, 191201, 8, '2025-05-17 15:21:02', '2025-05-17 15:24:04'),
+(9, 191201, 8, '2025-05-17 15:26:33', '2025-05-17 15:26:40'),
+(10, 191201, 8, '2025-05-17 15:27:59', '2025-05-17 15:28:06');
 
 --
 -- Indexes for dumped tables
@@ -204,6 +352,20 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `visitors`
+--
+ALTER TABLE `visitors`
+  ADD PRIMARY KEY (`visitor_id`);
+
+--
+-- Indexes for table `visitor_logs`
+--
+ALTER TABLE `visitor_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `fk_visitor_id` (`visitor_id`),
+  ADD KEY `fk_establishment_id` (`establishment_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -217,25 +379,37 @@ ALTER TABLE `establishments`
 -- AUTO_INCREMENT for table `failed_login_attempts`
 --
 ALTER TABLE `failed_login_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `persons`
 --
 ALTER TABLE `persons`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `person_tracks`
 --
 ALTER TABLE `person_tracks`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `visitors`
+--
+ALTER TABLE `visitors`
+  MODIFY `visitor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191202;
+
+--
+-- AUTO_INCREMENT for table `visitor_logs`
+--
+ALTER TABLE `visitor_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -246,6 +420,13 @@ ALTER TABLE `users`
 --
 ALTER TABLE `failed_login_attempts`
   ADD CONSTRAINT `failed_login_attempts_ibfk_1` FOREIGN KEY (`establishment_id`) REFERENCES `establishments` (`id`);
+
+--
+-- Constraints for table `visitor_logs`
+--
+ALTER TABLE `visitor_logs`
+  ADD CONSTRAINT `fk_establishment_id` FOREIGN KEY (`establishment_id`) REFERENCES `establishments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_visitor_id` FOREIGN KEY (`visitor_id`) REFERENCES `visitors` (`visitor_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
