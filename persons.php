@@ -290,11 +290,7 @@ include 'db_connect.php';
 
 	img {
 		max-width: 100px;
-<<<<<<< HEAD
 		max-height: 150px;
-=======
-		max-height:150px;
->>>>>>> new_feature
 	}
 </style>
 <script>

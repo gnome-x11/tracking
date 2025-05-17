@@ -584,30 +584,29 @@ if ($_SESSION["login_type"] == 1) {
                     function checkIDAuto() {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => {
-                            const studentId = $('#student_id').val().trim();
-                            if (studentId !== "") {
+                            const scannedValue = $('#student_id').val().trim();
+                            if (scannedValue !== "") {
+                                // First: Try matching student ID
                                 $.ajax({
                                     url: 'ajax.php?action=get_pdetails',
                                     method: "POST",
-                                    data: { student_id: studentId },
+                                    data: { student_id: scannedValue },
                                     success: function (resp) {
                                         try {
                                             const json = JSON.parse(resp);
 
                                             if (json.status === 1) {
-                                                // Update student info
+                                                // Valid student, show modal and submit form
                                                 $('#studentName').text(json.name);
                                                 $('#studentCollege').text(json.college);
                                                 $('#studentCourse').text(json.course);
                                                 $('#studentYear').text(json.year_level);
                                                 $('#studentStanding').text(json.standing);
-
                                                 if (json.photo) {
                                                     $('#studentPhoto').attr('src', json.photo);
                                                 }
 
                                                 $('#studentModal').modal('show');
-
                                                 $('[name="person_id"]').val(json.id);
                                                 $('#details').show();
 
@@ -615,30 +614,18 @@ if ($_SESSION["login_type"] == 1) {
                                                     $('#manage-records').submit();
                                                 }, 5000);
 
-                                            } else if (json.status === 3) {
-                                                alert_toast("Maximum attempts reached. Redirecting...", 'danger');
-                                                setTimeout(() => window.location.reload(), 2000);
-
-                                            } else if (json.status === 2 && json.attempts !== undefined) {
-                                                alert_toast(`Invalid! Attempts left: ${3 - json.attempts}`, 'danger');
-                                                $('#details').hide();
-
                                             } else {
-                                                alert_toast("Student not found!", 'danger');
-                                                $('#details').hide();
+                                                // If not found as student, fallback to visitor scan
+                                                scanVisitorToken(scannedValue);
                                             }
                                         } catch (e) {
-                                            console.error("Parsing error:", e);
-                                            console.error("Server returned:", resp);
-                                            alert_toast("Unexpected server response. Check console for details.", 'danger');
-                                            $('#details').hide();
+                                            console.error("Student response parse error:", e);
+                                            scanVisitorToken(scannedValue);
                                         }
                                     },
-                                    error: function (xhr, status, error) {
-                                        console.error('AJAX error:', error);
-                                        console.error('Full response:', xhr.responseText);
-                                        $('#details').hide();
-                                        alert_toast("Connection error. Please try again.", 'danger');
+                                    error: function () {
+                                        console.error("Student AJAX error. Trying visitor...");
+                                        scanVisitorToken(scannedValue);
                                     }
                                 });
                             } else {
@@ -646,6 +633,43 @@ if ($_SESSION["login_type"] == 1) {
                             }
                         }, 1500);
                     }
+
+                    function scanVisitorToken(token) {
+                        const establishmentId = '<?php echo $_SESSION['login_establishment_id']; ?>';
+
+                        $.ajax({
+                            url: 'ajax.php?action=scan_visitor',
+                            method: "POST",
+                            data: {
+                                token: token,
+                                establishment_id: establishmentId
+                            },
+                            success: function (resp) {
+                                try {
+                                    const result = JSON.parse(resp);
+                                    if (result.status === "success") {
+                                        let actionText = result.action === 'time_in' ? "Visitor logged IN" : "Visitor logged OUT";
+                                        alert_toast(actionText, 'success');
+                                    } else {
+                                        alert_toast(result.message || "Invalid visitor token", 'danger');
+                                    }
+                                } catch (e) {
+                                    console.error("Visitor response parse error:", e);
+                                    alert_toast("Unexpected error while scanning visitor QR", 'danger');
+                                }
+                            },
+                            error: function () {
+                                alert_toast("Failed to connect. Please try again.", 'danger');
+                            }
+                        });
+
+                        // Reset scanner input after visitor attempt
+                        setTimeout(() => {
+                            $('#student_id').val('');
+                        }, 2000);
+                    }
+
+
 
                 </script>
 
