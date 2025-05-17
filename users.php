@@ -2,7 +2,7 @@
     /* General Styles */
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: white;
+        background-color: #333;
         color: #212529;
 
     }
