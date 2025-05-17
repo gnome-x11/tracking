@@ -355,24 +355,22 @@ if ($_SESSION["login_type"] == 1) {
                             <h1 class="card-body-title">Please scan your QR Code to enter.</h1>
                             <hr>
                             <form action="" id="manage-records">
-                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : ""; ?>">
+                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
                                 <div class="form-group mb-3">
                                     <div class="qr-scanner-container">
-                                        <!-- Input Field (Behind) -->
-                                        <input type="number" class="scanner-input" id="student_id" name="student_id"
-                                            autocomplete="off" placeholder="Enter Student ID" oninput="checkIDAuto()">
-                                        <!-- QR Code Image Design (Front) -->
+                                        <!-- Student ID Input -->
+                                        <input type="text" class="scanner-input" id="student_id" name="student_id"
+                                               autocomplete="off" placeholder="Scan QR Code" oninput="checkIDAuto()">
+                                        <input type="hidden" id="visitor_token" name="token">
+                                        <!-- Visitor Token Input (Hidden) -->
+                                        <!-- QR Code Visual Elements -->
                                         <div class="qr-overlay">
                                             <img src="assets/img/barcodelogo.png" alt="QR Code" class="qr-code-image">
                                             <div class="scan-line"></div>
                                             <div class="laser-dot"></div>
                                             <div class="scanner-frame"></div>
                                         </div>
-
-
-
                                     </div>
-
 
                                     <div class="text-center mt-4">
                                         <button class="btn btn-success btn-lg" type="button" id="manage_visitor">
@@ -384,8 +382,9 @@ if ($_SESSION["login_type"] == 1) {
                                 <div id="details" style="display:none">
                                     <input type="hidden" name="person_id" value="">
                                     <input type="hidden" name="establishment_id"
-                                        value="<?php echo $_SESSION["login_establishment_id"]; ?>">
+                                           value="<?php echo $_SESSION['login_establishment_id']; ?>">
                                 </div>
+                            </form>
                                 <!-- ETO YUNG STUDENT INFO -->
 
                                 <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel"
@@ -584,30 +583,29 @@ if ($_SESSION["login_type"] == 1) {
                     function checkIDAuto() {
                         clearTimeout(timeout);
                         timeout = setTimeout(() => {
-                            const studentId = $('#student_id').val().trim();
-                            if (studentId !== "") {
+                            const scannedValue = $('#student_id').val().trim();
+                            if (scannedValue !== "") {
+                                // First: Try matching student ID
                                 $.ajax({
                                     url: 'ajax.php?action=get_pdetails',
                                     method: "POST",
-                                    data: { student_id: studentId },
+                                    data: { student_id: scannedValue },
                                     success: function (resp) {
                                         try {
                                             const json = JSON.parse(resp);
 
                                             if (json.status === 1) {
-                                                // Update student info
+                                                // Valid student, show modal and submit form
                                                 $('#studentName').text(json.name);
                                                 $('#studentCollege').text(json.college);
                                                 $('#studentCourse').text(json.course);
                                                 $('#studentYear').text(json.year_level);
                                                 $('#studentStanding').text(json.standing);
-
                                                 if (json.photo) {
                                                     $('#studentPhoto').attr('src', json.photo);
                                                 }
 
                                                 $('#studentModal').modal('show');
-
                                                 $('[name="person_id"]').val(json.id);
                                                 $('#details').show();
 
@@ -615,30 +613,18 @@ if ($_SESSION["login_type"] == 1) {
                                                     $('#manage-records').submit();
                                                 }, 5000);
 
-                                            } else if (json.status === 3) {
-                                                alert_toast("Maximum attempts reached. Redirecting...", 'danger');
-                                                setTimeout(() => window.location.reload(), 2000);
-
-                                            } else if (json.status === 2 && json.attempts !== undefined) {
-                                                alert_toast(`Invalid! Attempts left: ${3 - json.attempts}`, 'danger');
-                                                $('#details').hide();
-
                                             } else {
-                                                alert_toast("Student not found!", 'danger');
-                                                $('#details').hide();
+                                                // If not found as student, fallback to visitor scan
+                                                scanVisitorToken(scannedValue);
                                             }
                                         } catch (e) {
-                                            console.error("Parsing error:", e);
-                                            console.error("Server returned:", resp);
-                                            alert_toast("Unexpected server response. Check console for details.", 'danger');
-                                            $('#details').hide();
+                                            console.error("Student response parse error:", e);
+                                            scanVisitorToken(scannedValue);
                                         }
                                     },
-                                    error: function (xhr, status, error) {
-                                        console.error('AJAX error:', error);
-                                        console.error('Full response:', xhr.responseText);
-                                        $('#details').hide();
-                                        alert_toast("Connection error. Please try again.", 'danger');
+                                    error: function () {
+                                        console.error("Student AJAX error. Trying visitor...");
+                                        scanVisitorToken(scannedValue);
                                     }
                                 });
                             } else {
@@ -647,10 +633,74 @@ if ($_SESSION["login_type"] == 1) {
                         }, 1500);
                     }
 
-                </script>
+                    function scanVisitorToken(token) {
+                        const establishmentId = '<?php echo $_SESSION['login_establishment_id']; ?>';
+
+                        $.ajax({
+                            url: 'ajax.php?action=scan_visitor',
+                            method: "POST",
+                            data: {
+                                token: token,
+                                establishment_id: establishmentId
+                            },
+                            success: function (resp) {
+                                try {
+                                    const result = JSON.parse(resp);
+                                    if (result.status === "success") {
+                                        let actionText = result.action === 'time_in' ? "Visitor logged IN" : "Visitor logged OUT";
+                                        alert_toast(actionText, 'success');
+                                    } else {
+                                        alert_toast(result.message || "Invalid visitor token", 'danger');
+                                    }
+                                } catch (e) {
+                                    console.error("Visitor response parse error:", e);
+                                    alert_toast("Unexpected error while scanning visitor QR", 'danger');
+                                }
+                            },
+                            error: function () {
+                                alert_toast("Failed to connect. Please try again.", 'danger');
+                            }
+                        });
+
+                        // Reset scanner input after visitor attempt
+                        setTimeout(() => {
+                            $('#student_id').val('');
+                        }, 2000);
+                    }
 
 
-                <script>
+                    $('#scan-visitor').submit(function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            url: 'ajax.php?action=scan_visitor',
+                            data: new FormData(this),
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            method: 'POST',
+                            success: function(resp) {
+                                try {
+                                    resp = JSON.parse(resp);
+                                    if (resp.status === 'success') {
+                                        alert(`Visitor ${resp.action} recorded!`);
+                                        $('#visitor_token').val('');  // Clear the input after successful scan
+                                    } else {
+                                        alert(resp.message || 'An error occurred');
+                                    }
+                                } catch (e) {
+                                    console.error('Invalid JSON response', e);
+                                    alert('Unexpected response from server.');
+                                }
+                            },
+                            error: function(err) {
+                                console.error(err);
+                                alert('Request failed. Check console for details.');
+                            }
+                        });
+                    });
+
+
+
                     document.addEventListener('DOMContentLoaded', function () {
                         const sidebar = document.getElementById('sidebar');
                         const overlay = document.querySelector('.overlay');
