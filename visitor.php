@@ -281,24 +281,26 @@ include 'db_connect.php'; ?>
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
                                         $tracks = $conn->query(
-                                            "SELECT
-                                                v.visitor_id,
-                                                v.full_name,
-                                                v.contact_number,
-                                                v.email,
-                                                v.purpose,
-                                                v.establishment_id as v_establishment_id,
-                                                v.created_at,
-                                                v.token,
-                                                v.token_expiry,
-                                                l.log_id,
-                                                l.establishment_id as establishment_id,
-                                                l.time_in,
-                                                l.time_out
-                                            FROM visitors v
-                                            INNER JOIN visitor_logs l ON v.visitor_id = l.visitor_id
-                                            WHERE date(v.created_at) BETWEEN '{$from}' AND '{$to}' $ewhere
-                                            ORDER BY v.created_at DESC"
+                                        "SELECT
+                                            v.visitor_id,
+                                            v.full_name,
+                                            v.contact_number,
+                                            v.email,
+                                            v.purpose,
+                                            v.establishment_id AS v_establishment_id,
+                                            v.created_at,
+                                            v.token,
+                                            v.token_expiry,
+                                            l.log_id,
+                                            e.name AS establishment_name, -- join and select the name
+                                            l.time_in,
+                                            l.time_out
+                                        FROM visitors v
+                                        INNER JOIN visitor_logs l ON v.visitor_id = l.visitor_id
+                                        LEFT JOIN establishments e ON l.establishment_id = e.id
+                                        WHERE DATE(v.created_at) BETWEEN '{$from}' AND '{$to}' $ewhere
+                                        ORDER BY v.created_at DESC"
+
                                         );
 
 
@@ -330,7 +332,8 @@ include 'db_connect.php'; ?>
 												<p> <?php echo ucwords($row['time_out']) ?></p>
 											</td>
 											<td class="">
-												<p> <?php echo ucwords($row['establishment_id']) ?></p>
+
+												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
 											</td>
 											<td class="text-center">
 												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
