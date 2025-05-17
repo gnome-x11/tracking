@@ -2,31 +2,18 @@
 include "db_connect.php";
 
 if (!isset($_SESSION["login_type"])) {
-    header("Location: login.php");
-    exit();
+      header("Location: login.php");
+      exit();
 }
 
-if (
-    isset($_SESSION["invalid_attempts"]) &&
-    $_SESSION["invalid_attempts"] >= 3
-) {
-    $_SESSION["invalid_attempts"] = 0;
+if (isset($_SESSION["invalid_attempts"]) && $_SESSION["invalid_attempts"] >= 3) {
+      $_SESSION["invalid_attempts"] = 0;
 }
 
-$total_visitors_today = $conn
-    ->query(
-        "SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()"
-    )
-    ->fetch_assoc()["total"];
-$total_establishments = $conn
-    ->query("SELECT COUNT(*) as total FROM establishments")
-    ->fetch_assoc()["total"];
-$total_students = $conn
-    ->query("SELECT COUNT(*) as total FROM persons")
-    ->fetch_assoc()["total"];
-$total_staff = $conn
-    ->query("SELECT COUNT(*) as total FROM users WHERE type = 2")
-    ->fetch_assoc()["total"];
+$total_visitors_today = $conn->query("SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()")->fetch_assoc()["total"];
+$total_establishments = $conn->query("SELECT COUNT(*) as total FROM establishments")->fetch_assoc()["total"];
+$total_students = $conn->query("SELECT COUNT(*) as total FROM persons")->fetch_assoc()["total"];
+$total_staff = $conn->query("SELECT COUNT(*) as total FROM users WHERE type = 2")->fetch_assoc()["total"];
 
 $college_course = [];
 $college_course_query = $conn->query("
@@ -35,7 +22,7 @@ $college_course_query = $conn->query("
     GROUP BY college, course
 ");
 while ($row = $college_course_query->fetch_assoc()) {
-    $college_course[] = $row;
+      $college_course[] = $row;
 }
 
 $courses = [];
@@ -43,7 +30,7 @@ $course_query = $conn->query("SELECT course, COUNT(*) as count FROM persons
     JOIN person_tracks ON persons.id = person_tracks.person_id
     GROUP BY course");
 while ($row = $course_query->fetch_assoc()) {
-    $courses[] = $row;
+      $courses[] = $row;
 }
 
 $estabs = [];
@@ -52,7 +39,7 @@ $estab_query = $conn->query("SELECT e.name as est_name, COUNT(*) as total
     JOIN establishments e ON pt.establishment_id = e.id
     GROUP BY e.name");
 while ($row = $estab_query->fetch_assoc()) {
-    $estabs[] = $row;
+      $estabs[] = $row;
 }
 
 $daily = [];
@@ -63,7 +50,7 @@ GROUP BY hour
 ORDER BY hour");
 
 while ($row = $daily_query->fetch_assoc()) {
-    $daily[] = ["date" => $row["hour"], "total" => $row["total"]];
+      $daily[] = ["date" => $row["hour"], "total" => $row["total"]];
 }
 
 $weekly = [];
@@ -72,7 +59,7 @@ $weekly_query = $conn->query("SELECT DATE(date_created) as date, COUNT(*) as tot
     WHERE date_created >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     GROUP BY DATE(date_created)");
 while ($row = $weekly_query->fetch_assoc()) {
-    $weekly[] = $row;
+      $weekly[] = $row;
 }
 
 $monthly = [];
@@ -80,7 +67,7 @@ $monthly_query = $conn->query("SELECT DATE_FORMAT(date_created, '%Y-%m') as mont
     FROM person_tracks
     GROUP BY month");
 while ($row = $monthly_query->fetch_assoc()) {
-    $monthly[] = $row;
+      $monthly[] = $row;
 }
 
 $yearly = [];
@@ -89,7 +76,7 @@ $yearly_query = $conn->query("SELECT DATE_FORMAT(date_created, '%Y') as year, CO
     GROUP BY year");
 
 while ($row = $yearly_query->fetch_assoc()) {
-    $yearly[] = $row;
+      $yearly[] = $row;
 }
 
 $hourly = [];
@@ -97,23 +84,21 @@ $hourly_query = $conn->query("SELECT HOUR(date_created) as hour, COUNT(*) as tot
     FROM person_tracks
     GROUP BY hour ORDER BY hour");
 while ($row = $hourly_query->fetch_assoc()) {
-    $hourly[] = $row;
+      $hourly[] = $row;
 }
 
 $perPage = 5;
 $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
 $offset = ($page - 1) * $perPage;
-$totalQuery = $conn->query(
-    "SELECT COUNT(*) as total FROM failed_login_attempts"
-);
+$totalQuery = $conn->query("SELECT COUNT(*) as total FROM failed_login_attempts");
 $totalRow = $totalQuery->fetch_assoc();
 $totalResults = $totalRow["total"];
 $totalPages = ceil($totalResults / $perPage);
 
 $failed_attempts = [];
 if ($_SESSION["login_type"] == 1) {
-    $user_id = $_SESSION["login_id"];
-    $query = $conn->query("
+      $user_id = $_SESSION["login_id"];
+      $query = $conn->query("
         SELECT f.date_created, e.name as establishment, f.error_message
         FROM failed_login_attempts f
         JOIN establishments e ON f.establishment_id = e.id
@@ -121,9 +106,9 @@ if ($_SESSION["login_type"] == 1) {
         LIMIT $offset, $perPage
     ");
 
-    while ($row = $query->fetch_assoc()) {
-        $failed_attempts[] = $row;
-    }
+      while ($row = $query->fetch_assoc()) {
+            $failed_attempts[] = $row;
+      }
 }
 ?>
 
@@ -170,9 +155,7 @@ if ($_SESSION["login_type"] == 1) {
     <main class="dashboard-container">
         <!-- <div class="dashboard-header">
             <h1>Welcome to Pamantasan ng Lungsod ng Muntinlupa</h1> <br>
-            <h2>You are now Entering <?php echo htmlspecialchars(
-                $_SESSION["login_name"]
-            ); ?> </h2>
+            <h2>You are now Entering <?php echo htmlspecialchars($_SESSION["login_name"]); ?> </h2>
         </div> -->
         <!-- eto yung admin side -->
         <?php if ($_SESSION["login_type"] == 1): ?>
@@ -278,7 +261,7 @@ if ($_SESSION["login_type"] == 1) {
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <div class="alert alert-success mb-0" role="alert">
-                                            🎉 No failed login attempts found.
+                                            No failed login attempts found.
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -366,19 +349,13 @@ if ($_SESSION["login_type"] == 1) {
                             </div>
                             <div class="welcome-message">
                               <h3 class="welcome-heading">Welcome to Pamantasan ng Lungsod ng Muntinlupa</h3><br>
-                              <h3 class="entering-text">You are now entering <?php echo htmlspecialchars(
-                                  $_SESSION["login_name"]
-                              ); ?></h3>
+                              <h3 class="entering-text">You are now entering <?php echo htmlspecialchars($_SESSION["login_name"]); ?></h3>
 
                             </div>
                             <h1 class="card-body-title">Please scan your QR Code to enter.</h1>
                             <hr>
                             <form action="" id="manage-records">
-                                <input type="hidden" name="id" value="<?php echo isset(
-                                    $id
-                                )
-                                    ? $id
-                                    : ""; ?>">
+                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : ""; ?>">
                                 <div class="form-group mb-3">
                                     <div class="qr-scanner-container">
                                         <!-- Input Field (Behind) -->
@@ -407,9 +384,7 @@ if ($_SESSION["login_type"] == 1) {
                                 <div id="details" style="display:none">
                                     <input type="hidden" name="person_id" value="">
                                     <input type="hidden" name="establishment_id"
-                                        value="<?php echo $_SESSION[
-                                            "login_establishment_id"
-                                        ]; ?>">
+                                        value="<?php echo $_SESSION["login_establishment_id"]; ?>">
                                 </div>
                                 <!-- ETO YUNG STUDENT INFO -->
 
@@ -501,40 +476,39 @@ if ($_SESSION["login_type"] == 1) {
                                         </div>
                                     </div>
                                 </div>
-                                <script>
-                                    // JavaScript to handle image loading and sizing
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        const studentPhoto = document.getElementById('studentPhoto');
 
-                                        function adjustImage() {
-                                            if (!studentPhoto.complete) return;
-
-                                            const container = studentPhoto.closest('.photo-container-wrapper');
-                                            const containerWidth = container.offsetWidth;
-                                            const containerHeight = container.offsetHeight;
-
-                                            if (studentPhoto.naturalWidth > studentPhoto.naturalHeight) {
-                                                // Landscape image
-                                                studentPhoto.style.width = '90%';
-                                                studentPhoto.style.height = 'auto';
-                                            } else {
-                                                // Portrait or square image
-                                                studentPhoto.style.height = '90%';
-                                                studentPhoto.style.width = 'auto';
-                                            }
-                                        }
-
-                                        // Run on load and if image loads later
-                                        studentPhoto.onload = adjustImage;
-                                        if (studentPhoto.complete) adjustImage();
-                                    });
-                                </script>
                         </div>
                     </div>
                 <?php endif; ?>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script>
+                    // JavaScript to handle image loading and sizing
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const studentPhoto = document.getElementById('studentPhoto');
+
+                        function adjustImage() {
+                            if (!studentPhoto.complete) return;
+
+                            const container = studentPhoto.closest('.photo-container-wrapper');
+                            const containerWidth = container.offsetWidth;
+                            const containerHeight = container.offsetHeight;
+
+                            if (studentPhoto.naturalWidth > studentPhoto.naturalHeight) {
+                                // Landscape image
+                                studentPhoto.style.width = '90%';
+                                studentPhoto.style.height = 'auto';
+                            } else {
+                                // Portrait or square image
+                                studentPhoto.style.height = '90%';
+                                studentPhoto.style.width = 'auto';
+                            }
+                        }
+
+                        // Run on load and if image loads later
+                        studentPhoto.onload = adjustImage;
+                        if (studentPhoto.complete) adjustImage();
+                    });
 
                 $('#manage-records').submit(function (e) {
                     e.preventDefault();
@@ -805,14 +779,10 @@ if ($_SESSION["login_type"] == 1) {
                             const courseChart = new Chart(document.getElementById('courseChart'), {
                                 type: 'doughnut',
                                 data: {
-                                    labels: <?= json_encode(
-                                        array_column($courses, "course")
-                                    ) ?>,
+                                    labels: <?= json_encode(array_column($courses, "course")) ?>,
                                     datasets: [{
                                         label: 'Students',
-                                        data: <?= json_encode(
-                                            array_column($courses, "count")
-                                        ) ?>,
+                                        data: <?= json_encode(array_column($courses, "count")) ?>,
                                         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4bc0c0', '#9966ff'],
                                     }]
                                 },
@@ -840,14 +810,10 @@ if ($_SESSION["login_type"] == 1) {
                             const estabChart = new Chart(document.getElementById('estabChart'), {
                                 type: 'bar',
                                 data: {
-                                    labels: <?= json_encode(
-                                        array_column($estabs, "est_name")
-                                    ) ?>,
+                                    labels: <?= json_encode(array_column($estabs, "est_name")) ?>,
                                     datasets: [{
                                         label: 'Entries',
-                                        data: <?= json_encode(
-                                            array_column($estabs, "total")
-                                        ) ?>,
+                                        data: <?= json_encode(array_column($estabs, "total")) ?>,
                                         backgroundColor: '#28a745'
                                     }]
                                 }
@@ -860,19 +826,14 @@ if ($_SESSION["login_type"] == 1) {
                                 type: 'bar',
                                 data: {
                                     labels: <?= json_encode(
-                                        array_map(function ($h) {
-                                            return date(
-                                                "g A",
-                                                mktime($h["date"])
-                                            );
-                                        }, $daily)
+                                          array_map(function ($h) {
+                                                return date("g A", mktime($h["date"]));
+                                          }, $daily)
                                     ) ?>,
 
                                     datasets: [{
                                         label: 'Entries',
-                                        data: <?= json_encode(
-                                            array_column($daily, "total")
-                                        ) ?>,
+                                        data: <?= json_encode(array_column($daily, "total")) ?>,
                                         borderColor: '#17a2b8',
                                         backgroundColor: 'rgba(23, 162, 184, 0.1)',
                                         borderWidth: 2,
@@ -907,7 +868,11 @@ if ($_SESSION["login_type"] == 1) {
                             // Prepare data for each time period
                             const timePeriodData = {
                                 weekly: {
-                                    labels: <?= json_encode(array_map(function ($d) { return date("D, M j", strtotime($d["date"])); }, $weekly)) ?>,
+                                    labels: <?= json_encode(
+                                          array_map(function ($d) {
+                                                return date("D, M j", strtotime($d["date"]));
+                                          }, $weekly)
+                                    ) ?>,
                                     data: <?= json_encode(array_column($weekly, "total")) ?>,
                                     label: 'Weekly Entries',
                                     borderColor: '#ffc107',
