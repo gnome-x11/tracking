@@ -158,29 +158,34 @@ class Action
 		if ($delete)
 			return 1;
 	}
-
 	function save_visitor() {
     extract($_POST);
 
     if (empty($full_name) || empty($email)) {
-        return json_encode(["status" => "error", "message" => "Full Name and Email is Required"]);
+        return json_encode(["status" => "error", "message" => "Full Name and Email are Required"]);
     }
+
+    // Generate token and expiry
+    $token = bin2hex(random_bytes(16));
+    $token_expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
     $data = "full_name = '$full_name'";
     $data .= ", contact_number = '$contact_number'";
     $data .= ", email = '$email'";
     $data .= ", purpose = '$purpose'";
     $data .= ", establishment_id = " . intval($establishment_id);
-    $data .= ", created_at = '" . $created_at . "'";
+    $data .= ", created_at = '$created_at'";
+    $data .= ", token = '$token'";
+    $data .= ", token_expiry = '$token_expiry'";
 
     $save = $this->db->query("INSERT INTO visitors SET $data");
 
     if ($save) {
-        $visitor_id = $this->db->insert_id; // Get the ID of the newly inserted record
+        $visitor_id = $this->db->insert_id;
 
-        // Generate QR Code
+        // Generate QR Code with token
         require 'assets/qrcode/phpqrcode/qrlib.php';
-        $qrContent = $visitor_id;
+        $qrContent = $token;
         $tempDir = 'temp_qr/';
         if (!file_exists($tempDir)) {
             mkdir($tempDir, 0755, true);
@@ -190,46 +195,88 @@ class Action
 
         // Send Email
         require 'vendor/autoload.php';
-
         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
         $email_sent = false;
 
         try {
-            // SMTP Configuration
+            // SMTP Config
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'plmunacesscontrolsystem@gmail.com'; // Update with your email
-            $mail->Password   = 'kqdw nyuy rvqx qbff';    // Update with your app password
+            $mail->Username   = 'dex.raromin@gmail.com'; // Replace with your email
+            $mail->Password   = 'scnv ntfq vnjb bxov';    // Replace with your app password
             $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port       = 465;
 
-            // Recipients
-            $mail->setFrom('your_email@gmail.com', 'PLMUN Access Control');
+            // Email
+            $mail->setFrom('your_email@gmail.com', 'PLMUN Access Control'); // Update
             $mail->addAddress($email);
-
-            // Attach QR Code
             $mail->addAttachment($qrFile);
 
-            // Email Content
             $mail->isHTML(true);
-            $mail->Subject = 'Your Visit QR Code';
-            $mail->Body    = 'Attached is your QR code for time in and out.';
-            $mail->AltBody = 'Attached is your QR code for time in and out.';
+            $mail->Subject = 'Hi, this is your PLMUN Access Control QR Code';
+            $mail->Body    = 'Please scan this QR code in the entrance kiosk. (Note: This QR code is reusable across entrances, but will expire in 24 hours)';
+            $mail->AltBody = 'Attached is your QR code for time in/out.';
 
             $mail->send();
             $email_sent = true;
 
-            // Cleanup
-            unlink($qrFile);
+            // Clean up temp QR image
+            if (file_exists($qrFile)) {
+                unlink($qrFile);
+            }
         } catch (Exception $e) {
             error_log("Email Error: " . $mail->ErrorInfo);
         }
 
         return json_encode(array("status" => 1, "visitor_id" => $visitor_id, "email_sent" => $email_sent));
     } else {
-        return json_encode(array("status" => 0, "message" => "Failed to save track"));
+        return json_encode(array("status" => 0, "message" => "Failed to save visitor"));
     }
+}
+
+function scan_visitor() {
+    extract($_POST);
+
+    if (empty($token) || empty($establishment_id)) {
+        return json_encode(["status" => "error", "message" => "Token and Establishment ID are required"]);
+    }
+
+    // Validate token
+    $visitor = $this->db->query("SELECT visitor_id FROM visitors WHERE token = '$token' AND token_expiry > NOW()");
+    if ($visitor->num_rows === 0) {
+        return json_encode(["status" => "error", "message" => "Invalid or expired QR code"]);
+    }
+
+    $visitor_id = $visitor->fetch_assoc()['visitor_id'];
+    $establishment_id = intval($establishment_id);
+
+    // Check last log entry
+    $last_log = $this->db->query("SELECT log_id, time_out FROM visitor_logs
+                                WHERE visitor_id = $visitor_id
+                                AND establishment_id = $establishment_id
+                                ORDER BY log_id DESC LIMIT 1");
+
+    if ($last_log->num_rows > 0) {
+        $log = $last_log->fetch_assoc();
+        if (empty($log['time_out'])) {
+            // Update time_out
+            $this->db->query("UPDATE visitor_logs SET time_out = NOW() WHERE log_id = " . $log['log_id']);
+            $action = 'time_out';
+        } else {
+            // Create new time_in
+            $this->db->query("INSERT INTO visitor_logs (visitor_id, establishment_id, time_in)
+                            VALUES ($visitor_id, $establishment_id, NOW())");
+            $action = 'time_in';
+        }
+    } else {
+        // First entry
+        $this->db->query("INSERT INTO visitor_logs (visitor_id, establishment_id, time_in)
+                        VALUES ($visitor_id, $establishment_id, NOW())");
+        $action = 'time_in';
+    }
+
+    return json_encode(["status" => "success", "action" => $action]);
 }
 
 

@@ -355,24 +355,22 @@ if ($_SESSION["login_type"] == 1) {
                             <h1 class="card-body-title">Please scan your QR Code to enter.</h1>
                             <hr>
                             <form action="" id="manage-records">
-                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : ""; ?>">
+                                <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
                                 <div class="form-group mb-3">
                                     <div class="qr-scanner-container">
-                                        <!-- Input Field (Behind) -->
-                                        <input type="number" class="scanner-input" id="student_id" name="student_id"
-                                            autocomplete="off" placeholder="Enter Student ID" oninput="checkIDAuto()">
-                                        <!-- QR Code Image Design (Front) -->
+                                        <!-- Student ID Input -->
+                                        <input type="text" class="scanner-input" id="student_id" name="student_id"
+                                               autocomplete="off" placeholder="Scan QR Code" oninput="checkIDAuto()">
+                                        <input type="hidden" id="visitor_token" name="token">
+                                        <!-- Visitor Token Input (Hidden) -->
+                                        <!-- QR Code Visual Elements -->
                                         <div class="qr-overlay">
                                             <img src="assets/img/barcodelogo.png" alt="QR Code" class="qr-code-image">
                                             <div class="scan-line"></div>
                                             <div class="laser-dot"></div>
                                             <div class="scanner-frame"></div>
                                         </div>
-
-
-
                                     </div>
-
 
                                     <div class="text-center mt-4">
                                         <button class="btn btn-success btn-lg" type="button" id="manage_visitor">
@@ -384,8 +382,9 @@ if ($_SESSION["login_type"] == 1) {
                                 <div id="details" style="display:none">
                                     <input type="hidden" name="person_id" value="">
                                     <input type="hidden" name="establishment_id"
-                                        value="<?php echo $_SESSION["login_establishment_id"]; ?>">
+                                           value="<?php echo $_SESSION['login_establishment_id']; ?>">
                                 </div>
+                            </form>
                                 <!-- ETO YUNG STUDENT INFO -->
 
                                 <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel"
@@ -671,10 +670,8 @@ if ($_SESSION["login_type"] == 1) {
 
 
 
-                </script>
 
 
-                <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const sidebar = document.getElementById('sidebar');
                         const overlay = document.querySelector('.overlay');
