@@ -349,7 +349,7 @@ while ($row = $hourly_query->fetch_assoc()) {
                                         <!-- Student ID Input -->
                                         <input type="text" class="scanner-input" id="student_id" name="student_id"
                                                autocomplete="off" placeholder="Scan QR Code" oninput="checkIDAuto()">
-                                        <input type="hidden" id="visitor_token" name="token">
+                                        <input type="hidden" id="visitor_token" name="token" >
                                         <!-- Visitor Token Input (Hidden) -->
                                         <!-- QR Code Visual Elements -->
                                         <div class="qr-overlay">
@@ -465,6 +465,40 @@ while ($row = $hourly_query->fetch_assoc()) {
                                 </div>
                         </div>
                     </div>
+
+                    <!-- Time-in Modal -->
+                    <div class="modal fade" id="visitorTimeInModal" tabindex="-1" aria-labelledby="visitorTimeInLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-success">
+                          <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="visitorTimeInLabel">Visitor Entry</h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body text-center">
+                            <h4><strong>Entered <span id="timeInEstablishmentName"></span></strong></h4>
+                            <p class="text-success fs-5 mt-3">✔ Confirmed</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Time-out Modal -->
+                    <div class="modal fade" id="visitorTimeOutModal" tabindex="-1" aria-labelledby="visitorTimeOutLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-danger">
+                          <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="visitorTimeOutLabel">Visitor Exit</h5>
+                            <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body text-center">
+                            <h4><strong>Exited <span id="timeOutEstablishmentName"></span></strong></h4>
+                            <p class="text-danger fs-5 mt-3">✔ Confirmed</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
                 <?php endif; ?>
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -621,7 +655,9 @@ while ($row = $hourly_query->fetch_assoc()) {
                     }
 
                     function scanVisitorToken(token) {
+
                         const establishmentId = '<?php echo $_SESSION['login_establishment_id']; ?>';
+                        sessionStorage.setItem('last_visitor_token', token);
 
                         $.ajax({
                             url: 'ajax.php?action=scan_visitor',
@@ -634,8 +670,28 @@ while ($row = $hourly_query->fetch_assoc()) {
                                 try {
                                     const result = JSON.parse(resp);
                                     if (result.status === "success") {
-                                        let actionText = result.action === 'time_in' ? "Visitor Time-in Recorded" : "Visitor Time-out Recorded"; //palitan mo nalang to ubos na english ko HAHA
-                                        alert_toast(actionText, 'success');
+                                        const establishmentName = '<?php echo $_SESSION['login_establishment_name']; ?>';
+                                        let actionText = "";
+                                        let modal;
+
+                                        if (result.action === 'time_in') {
+                                            actionText = "Visitor Time-in Recorded";
+                                            $('#timeInEstablishmentName').text(establishmentName);
+                                            modal = new bootstrap.Modal(document.getElementById('visitorTimeInModal'));
+                                        } else if (result.action === 'time_out') {
+                                            actionText = "Visitor Time-out Recorded";
+                                            $('#timeOutEstablishmentName').text(establishmentName);
+                                            modal = new bootstrap.Modal(document.getElementById('visitorTimeOutModal'));
+                                        }
+
+                                        modal.show();
+
+                                        // Auto close modal after 3 seconds, then show toast
+                                        setTimeout(() => {
+                                            modal.hide();
+                                            alert_toast(actionText, 'success');
+                                        }, 3000);
+
                                     } else {
                                         alert_toast(result.message || "Invalid visitor token", 'danger');
                                     }
@@ -650,9 +706,13 @@ while ($row = $hourly_query->fetch_assoc()) {
                         });
 
                         // Reset scanner input after visitor attempt
+                        // Reset scanner input and refocus after visitor attempt
                         setTimeout(() => {
-                            $('#student_id').val('');
+                            const input = $('#student_id');
+                            input.val('');
+                            input.focus();
                         }, 2000);
+
                     }
 
                     document.addEventListener('DOMContentLoaded', function () {
@@ -956,6 +1016,24 @@ while ($row = $hourly_query->fetch_assoc()) {
                             $('#student_id').focus();
                         }
                     });
+
+                    $(document).ready(function () {
+                        // Get stored visitor token
+                        const lastVisitorToken = sessionStorage.getItem('last_visitor_token');
+
+                        if (lastVisitorToken) {
+                            $('#visitor_token')
+                                .val(lastVisitorToken)
+                                .focus()
+                                .select();
+                            // Clear the stored value after restoring
+                            sessionStorage.removeItem('last_visitor_token');
+                        } else {
+                            // Default focus if no stored value
+                            $('#visitor_token').focus();
+                        }
+                    });
+
 
                     // Confirmation dialog function
                       function _conf(message, callback, args = []) {
