@@ -361,10 +361,6 @@ include 'db_connect.php'; ?>
 </style>
 <script>
 
-
-
-<<<<<<< HEAD
-=======
 function _conf(msg, func, params = []) {
     $('#confirm_modal .modal-body').html(msg);
     $('#confirm_modal').modal('show');
@@ -373,33 +369,14 @@ function _conf(msg, func, params = []) {
 	$('#clear_logs').click(function () {
     _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
 });
-
->>>>>>> refinement
 
 	$('#filter').click(function () {
 		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
-
-<<<<<<< HEAD
-function _conf(msg, func, params = []) {
-    $('#confirm_modal .modal-body').html(msg);
-    $('#confirm_modal').modal('show');
-    $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
-}
-	$('#clear_logs').click(function () {
-    _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
-});
-
 	function confirm_clear_logs() {
     clear_logs();
 }
 
-=======
-	function confirm_clear_logs() {
-    clear_logs();
-}
-
->>>>>>> refinement
 	function clear_logs() {
 	  start_load()
 			$.ajax({

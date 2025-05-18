@@ -216,23 +216,12 @@ include 'db_connect.php'; ?>
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-<<<<<<< HEAD
 						<b>Visitors Logs</b>
 						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-danger btn-sm mr-2" type="button" id="delete_visitors">
-								<i class="fa fa-trash"></i> Delete Visitor Lists
+							<button class="btn btn-danger btn-sm mr-2" type="button" id="clear_logs">
+								<i class="fa fa-trash"></i> Delete All Logs
 							</button>
 
-=======
-						<b>Monitoring List</b>
-						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-primary btn-sm mr-2" type="button" id="new_records">
-								<i class="fa fa-plus"></i> New
-							</button>
-							<button class="btn btn-success btn-sm" type="button" id="print">
-								<i class="fa fa-print"></i> Print
-							</button>
->>>>>>> refinement
 						</span>
 					</div>
 
@@ -269,27 +258,15 @@ include 'db_connect.php'; ?>
 								</colgroup>
 								<thead>
 									<tr>
-<<<<<<< HEAD
-										<th class="text-center">No.</th>
-										<th class="">Visitor ID</th>
-										<th class="">Full Name</th>
-										<th class="">Email</th>
-										<th class="">Contact Number</th>
-										<th class="">Purpose</th>
-										<th class="">Date</th>
-
-=======
 										<th class="text-center">#</th>
 										<th class="">Visitor ID</th>
 										<th class="">Full Name</th>
 										<th class="">Email</th>
+										<th class="">Entered In</th>
 										<th class="">Purposse</th>
-										<th class="">Date></th>
+										<th class="">Date</th>
 										<th class="">Time - in</th>
 										<th class="">Time - out</th>
-										<th class="">Entered In</th>
-										<th class="text-center">Action</th>
->>>>>>> refinement
 									</tr>
 								</thead>
 								<tbody>
@@ -301,22 +278,6 @@ include 'db_connect.php'; ?>
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
                                         $tracks = $conn->query(
-<<<<<<< HEAD
-                                       " SELECT
-                                            v.visitor_id,
-                                            v.full_name,
-                                            v.email,
-                                            v.contact_number,
-                                            v.purpose,
-                                            v.created_at
-                                        FROM
-                                            visitors v
-                                        ORDER BY
-                                            v.created_at DESC;
-"
-
-                                        );
-=======
                                         "SELECT
                                             v.visitor_id,
                                             v.full_name,
@@ -340,7 +301,6 @@ include 'db_connect.php'; ?>
                                         );
 
 
->>>>>>> refinement
 									while ($row = $tracks->fetch_assoc()):
 										?>
 										<tr>
@@ -357,38 +317,21 @@ include 'db_connect.php'; ?>
 												<p> <?php echo $row['email'] ?></p>
 											</td>
 											<td class="">
-<<<<<<< HEAD
-												<p> <?php echo $row['contact_number'] ?></p>
+
+												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
 											</td>
 											<td class="">
-=======
->>>>>>> refinement
 												<p> <?php echo $row['purpose'] ?></p>
 											</td>
 											<td class="">
 												<p> <?php echo $row['created_at'] ?></p>
 											</td>
-<<<<<<< HEAD
-=======
 											<td class="">
 												<p> <?php echo $row['time_in'] ?></p>
 											</td>
 											<td class="">
 												<p> <?php echo ucwords($row['time_out']) ?></p>
 											</td>
-											<td class="">
-
-												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
-											</td>
-											<td class="text-center">
-												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
-
-													<button class="btn btn-sm btn-outline-danger delete_visitor"
-														type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
-												</div>
-											</td>
-
->>>>>>> refinement
 										</tr>
 									<?php endwhile; ?>
 								</tbody>
@@ -418,63 +361,34 @@ include 'db_connect.php'; ?>
 </style>
 <script>
 
-<<<<<<< HEAD
+function _conf(msg, func, params = []) {
+    $('#confirm_modal .modal-body').html(msg);
+    $('#confirm_modal').modal('show');
+    $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+}
+	$('#clear_logs').click(function () {
+    _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
+});
 
-	$('#filter').click(function () {
-		location.replace("index.php?page=visitor_list&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
-	})
-
-    function _conf(msg, func, params = []) {
-        $('#confirm_modal .modal-body').html(msg);
-        $('#confirm_modal').modal('show');
-        $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
-    }
-
-		$('#delete_visitors').click(function () {
-		_conf ("Delete All Visitors?" , "confirm_delete_visitors");
-		});
-
-		function confirm_delete_visitors() {
-		  delete_visitors();
-		}
-
-      function delete_visitors() {
-        start_load()
-          $.ajax({
-            url: 'ajax.php?action=delete_visitors',
-            method: 'POST',
-            success: function (resp) {
-              if (resp == 1) {
-                alert_toast("Visitor list cleared successfully", "success")
-                setTimeout(function () {
-                  location.reload()
-                }, 1500)
-              }
-            }
-
-          })
-      }
-=======
 	$('#filter').click(function () {
 		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
+	function confirm_clear_logs() {
+    clear_logs();
+}
 
-	function delete_visitor($id) {
-		start_load()
-		$.ajax({
-			url: 'ajax.php?action=delete_visitor',
-			method: 'POST',
-			data: { id: $id },
+	function clear_logs() {
+	  start_load()
+			$.ajax({
+			url: 'ajax.php?action=clear_logs',
+			method: "POST",
 			success: function (resp) {
-				if (resp == 1) {
-					alert_toast("Data successfully deleted", 'success')
-					setTimeout(function () {
-						location.reload()
-					}, 1500)
-
-				}
-			}
-		})
+			  if (resp == 1) {
+					alert_toast("Visitor logs cleared succesffuly", "success")
+					setTimeout(function() {
+					location.reload()
+					}, 1500)}
+			    }
+			})
 	}
->>>>>>> refinement
 </script>
