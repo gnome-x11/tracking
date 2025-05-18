@@ -54,6 +54,19 @@ if ($action == 'delete_visitors'){
         echo $save;
 }
 
+if ($action == 'delete_records'){
+    $save = $crud->delete_records();
+    if ($save)
+        echo $save;
+}
+
+if ($action == 'clear_records'){
+    $save = $crud->clear_records();
+    if ($save)
+        echo $save;
+}
+
+
 if($action == 'delete_user'){
 	$save = $crud->delete_user();
 	if($save)

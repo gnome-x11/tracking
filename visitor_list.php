@@ -218,10 +218,14 @@ include 'db_connect.php'; ?>
 					<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
 						<b>Visitors Logs</b>
 						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-danger btn-sm mr-2" type="button" id="clear_logs">
-								<i class="fa fa-trash"></i> Delete All Logs
+							<button class="btn btn-danger btn-sm mr-2" type="button" id="delete_visitors">
+								<i class="fa fa-trash"></i> Delete Visitor Lists
 							</button>
+						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
 
+							<button class="btn btn-success btn-sm" type="button" id="print">
+								<i class="fa fa-print"></i> Print
+							</button>
 						</span>
 					</div>
 
@@ -258,15 +262,14 @@ include 'db_connect.php'; ?>
 								</colgroup>
 								<thead>
 									<tr>
-										<th class="text-center">#</th>
+										<th class="text-center">No.</th>
 										<th class="">Visitor ID</th>
+										<th class="">Image</th>
 										<th class="">Full Name</th>
 										<th class="">Email</th>
-										<th class="">Entered In</th>
-										<th class="">Purposse</th>
+										<th class="">Contact Number</th>
+										<th class="">Purpose</th>
 										<th class="">Date</th>
-										<th class="">Time - in</th>
-										<th class="">Time - out</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -278,29 +281,22 @@ include 'db_connect.php'; ?>
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
                                         $tracks = $conn->query(
-                                        "SELECT
+
+                                       " SELECT
                                             v.visitor_id,
+                                            v.imagePath,
                                             v.full_name,
-                                            v.contact_number,
                                             v.email,
+                                            v.contact_number,
                                             v.purpose,
-                                            v.establishment_id AS v_establishment_id,
-                                            v.created_at,
-                                            v.token,
-                                            v.token_expiry,
-                                            l.log_id,
-                                            e.name AS establishment_name, -- join and select the name
-                                            l.time_in,
-                                            l.time_out
-                                        FROM visitors v
-                                        INNER JOIN visitor_logs l ON v.visitor_id = l.visitor_id
-                                        LEFT JOIN establishments e ON l.establishment_id = e.id
-                                        WHERE DATE(v.created_at) BETWEEN '{$from}' AND '{$to}' $ewhere
-                                        ORDER BY v.created_at DESC"
+                                            v.created_at
+                                        FROM
+                                            visitors v
+                                        ORDER BY
+                                            v.created_at DESC;
+"
 
                                         );
-
-
 									while ($row = $tracks->fetch_assoc()):
 										?>
 										<tr>
@@ -311,26 +307,23 @@ include 'db_connect.php'; ?>
 												<p> <?php echo $row['visitor_id'] ?></p>
 											</td>
 											<td class="">
+												<img src="<?php echo $row['imagePath'] ?>" >
+											</td>
+											<td class="">
 												<p> <?php echo ucwords($row['full_name']) ?></p>
 											</td>
 											<td class="">
 												<p> <?php echo $row['email'] ?></p>
 											</td>
 											<td class="">
-
-												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
+												<p> <?php echo $row['contact_number'] ?></p>
 											</td>
 											<td class="">
+
 												<p> <?php echo $row['purpose'] ?></p>
 											</td>
 											<td class="">
 												<p> <?php echo $row['created_at'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['time_in'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo ucwords($row['time_out']) ?></p>
 											</td>
 										</tr>
 									<?php endwhile; ?>
@@ -361,34 +354,38 @@ include 'db_connect.php'; ?>
 </style>
 <script>
 
-function _conf(msg, func, params = []) {
-    $('#confirm_modal .modal-body').html(msg);
-    $('#confirm_modal').modal('show');
-    $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
-}
-	$('#clear_logs').click(function () {
-    _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
-});
-
 	$('#filter').click(function () {
-		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
+		location.replace("index.php?page=visitor_list&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
-	function confirm_clear_logs() {
-    clear_logs();
-}
 
-	function clear_logs() {
-	  start_load()
-			$.ajax({
-			url: 'ajax.php?action=clear_logs',
-			method: "POST",
-			success: function (resp) {
-			  if (resp == 1) {
-					alert_toast("Visitor logs cleared succesffuly", "success")
-					setTimeout(function() {
-					location.reload()
-					}, 1500)}
-			    }
-			})
-	}
+    function _conf(msg, func, params = []) {
+        $('#confirm_modal .modal-body').html(msg);
+        $('#confirm_modal').modal('show');
+        $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+    }
+
+		$('#delete_visitors').click(function () {
+		_conf ("Delete All Visitors?" , "confirm_delete_visitors");
+		});
+
+		function confirm_delete_visitors() {
+		  delete_visitors();
+		}
+
+      function delete_visitors() {
+        start_load()
+          $.ajax({
+            url: 'ajax.php?action=delete_visitors',
+            method: 'POST',
+            success: function (resp) {
+              if (resp == 1) {
+                alert_toast("Visitor list cleared successfully", "success")
+                setTimeout(function () {
+                  location.reload()
+                }, 1500)
+              }
+            }
+
+          })
+      }
 </script>

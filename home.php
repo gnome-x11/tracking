@@ -239,12 +239,15 @@ while ($row = $hourly_query->fetch_assoc()) {
 
                         <div class="col-md-12">
                             <div class="card">
-                                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-                                    <span>Failed Login Attempts</span>
-                                    <button class="btn btn-light btn-sm text-danger delete_records" data-id="all">Clear Logs</button>
-                                </div>
+                                <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+              						<b>Failed Attempts Logs</b>
+              						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
+             							<button class="btn btn-danger btn-sm mr-2" type="button" id="delete_records">
+                								<i class="fa fa-trash"></i> Delete All Logs
+             							</button>
 
-
+              						</span>
+               					</div>
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table id="failedLoginsTable" class="table table-striped table-bordered">
@@ -300,6 +303,34 @@ while ($row = $hourly_query->fetch_assoc()) {
                                 "lengthChange": false, // hide the 'show x entries' dropdown
                             });
                         });
+
+                        function _conf(msg, func, params = []) {
+                            $('#confirm_modal .modal-body').html(msg);
+                            $('#confirm_modal').modal('show');
+                            $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+                        }
+                           	$('#delete_records').click(function () {
+                                      _conf("Are you sure you want to delete all failed attempts logs?", "confirm_delete_records");
+                                  });
+
+                           	function confirm_delete_records() {
+                                                   delete_records();
+                                                }
+
+                           	function delete_records() {
+                           	  start_load()
+                           			$.ajax({
+                           			url: 'ajax.php?action=delete_records',
+                           			method: "POST",
+                           			success: function (resp) {
+                           			  if (resp == 1) {
+                           					alert_toast("Failed Attempts logs cleared succesffuly", "success")
+                           					setTimeout(function() {
+                           					location.reload()
+                           					}, 1500)}
+                           			    }
+                           			})
+                           	}
                     </script>
                     </div>
 
@@ -1035,28 +1066,6 @@ while ($row = $hourly_query->fetch_assoc()) {
 
 
 
-                      // Handle button click and call _conf
-                      $('.delete_records').click(function () {
-                          _conf("Are you sure you want to clear all logs?", "delete_records", [$(this).attr('data-id')]);
-                      });
-
-                      // Actual deletion logic via AJAX
-                      function delete_records(id) {
-                          if (id === "all") {
-                              $.ajax({
-                                  url: "ajax/clear_failed_logs.php",
-                                  method: "POST",
-                                  data: { action: "clear_all" },
-                                  success: function (res) {
-                                      alert("All logs cleared successfully!");
-                                      location.reload();
-                                  },
-                                  error: function () {
-                                      alert("Failed to clear logs. Please try again.");
-                                  }
-                              });
-                          }
-                      }
                 </script>
 </body>
 

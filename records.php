@@ -216,13 +216,14 @@ include 'db_connect.php'; ?>
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-						<b>Monitoring List</b>
+						<b>Student Monitoring List</b>
 						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-primary btn-sm mr-2" type="button" id="new_records">
-								<i class="fa fa-plus"></i> New
-							</button>
+
 							<button class="btn btn-success btn-sm" type="button" id="print">
 								<i class="fa fa-print"></i> Print
+							</button>
+							<button class="btn btn-danger btn-sm" type="button" id="clear_records">
+								<i class="fa fa-trash"></i> Clear
 							</button>
 						</span>
 					</div>
@@ -244,6 +245,7 @@ include 'db_connect.php'; ?>
 							<div class="col-md-2">
 								<label for="" class="control-label">&nbsp</label>
 								<button class="btn btn-primary btn-block" id="filter" type="button">Filter</button>
+
 							</div>
 						</div>
 						<hr>
@@ -269,7 +271,6 @@ include 'db_connect.php'; ?>
 										<th class="">Year</th>
 										<th class="">Standing</th>
 										<th class="">Establishment</th>
-										<th class="text-center">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -325,13 +326,7 @@ include 'db_connect.php'; ?>
 											<td class="">
 												<p> <?php echo ucwords($row['ename']) ?></p>
 											</td>
-											<td class="text-center">
-												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
 
-													<button class="btn btn-sm btn-outline-danger delete_records"
-														type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
-												</div>
-											</td>
 
 										</tr>
 									<?php endwhile; ?>
@@ -413,21 +408,31 @@ include 'db_connect.php'; ?>
 		location.replace("index.php?page=records&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
 
-	function delete_records($id) {
-		start_load()
-		$.ajax({
-			url: 'ajax.php?action=delete_records',
-			method: 'POST',
-			data: { id: $id },
-			success: function (resp) {
-				if (resp == 1) {
-					alert_toast("Data successfully deleted", 'success')
-					setTimeout(function () {
-						location.reload()
-					}, 1500)
+	function _conf(msg, func, params = []) {
+          $('#confirm_modal .modal-body').html(msg);
+          $('#confirm_modal').modal('show');
+          $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+      }
+         	$('#clear_records').click(function () {
+                    _conf("Are you sure you want to delete all records?", "confirm_clear_records");
+                });
 
-				}
-			}
-		})
-	}
+         	function confirm_clear_records() {
+                                  clear_records();
+                              }
+
+         	function clear_records() {
+         	  start_load()
+         			$.ajax({
+         			url: 'ajax.php?action=clear_records',
+         			method: "POST",
+         			success: function (resp) {
+         			  if (resp == 1) {
+         					alert_toast(" Cleared succesffuly", "success")
+         					setTimeout(function() {
+         					location.reload()
+         					}, 1500)}
+         			    }
+         			})
+         	}
 </script>

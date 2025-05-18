@@ -60,7 +60,7 @@
         <a href="index.php?page=records" class="nav-item nav-records">
             <span class='icon-field'><i class="fa fa-th-list"></i></span> Records
         </a>
-        <a href="index.php?page=visitor" class="nav-item nav-visitors">
+        <a href="index.php?page=visitor_logs" class="nav-item nav-visitors">
             <span class='icon-field'><i class="fa fa-th-list"></i></span> Visitors Logs
         </a>
         <a href="index.php?page=visitor_list" class="nav-item nav-visitor_list">

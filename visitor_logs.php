@@ -360,6 +360,9 @@ include 'db_connect.php'; ?>
 	}
 </style>
 <script>
+	$('#filter').click(function () {
+		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
+	})
 
 function _conf(msg, func, params = []) {
     $('#confirm_modal .modal-body').html(msg);
@@ -370,9 +373,6 @@ function _conf(msg, func, params = []) {
     _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
 });
 
-	$('#filter').click(function () {
-		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
-	})
 	function confirm_clear_logs() {
     clear_logs();
 }
