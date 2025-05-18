@@ -60,8 +60,11 @@
         <a href="index.php?page=records" class="nav-item nav-records">
             <span class='icon-field'><i class="fa fa-th-list"></i></span> Records
         </a>
-        <a href="index.php?page=visitor" class="nav-item nav-records">
-            <span class='icon-field'><i class="fa fa-th-list"></i></span> Visitors
+        <a href="index.php?page=visitor" class="nav-item nav-visitors">
+            <span class='icon-field'><i class="fa fa-th-list"></i></span> Visitors Logs
+        </a>
+        <a href="index.php?page=visitor_list" class="nav-item nav-visitor_list">
+            <span class='icon-field'><i class="fa fa-th-list"></i></span> Visitors List
         </a>
         <?php if ($_SESSION['login_type'] == 1): ?>
             <a href="index.php?page=establishment" class="nav-item nav-establishment">

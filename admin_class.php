@@ -285,13 +285,21 @@ class Action
             return json_encode(["status" => "success", "action" => $action]);
       }
 
-      function delete_visitor()
+      function clear_logs()
       {
             extract($_POST);
-            $delete = $this->db->query("DELETE FROM visitors where visitor_id = " . $id);
+            $delete = $this->db->query("DELETE FROM visitor_logs");
             if ($delete) {
                   return 1;
             }
+      }
+
+      function delete_visitors() {
+          extract($_POST);
+          $delete = $this->db->query("DELETE FROM visitors");
+          if ($delete) {
+              return 1;
+          }
       }
 
       function save_person()

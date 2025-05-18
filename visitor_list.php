@@ -216,12 +216,14 @@ include 'db_connect.php'; ?>
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-						<b>Visitors Logs</b>
+						<b>Monitoring List</b>
 						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-danger btn-sm mr-2" type="button" id="clear_logs">
-								<i class="fa fa-trash"></i> Delete All Logs
+							<button class="btn btn-primary btn-sm mr-2" type="button" id="new_records">
+								<i class="fa fa-plus"></i> New
 							</button>
-
+							<button class="btn btn-success btn-sm" type="button" id="print">
+								<i class="fa fa-print"></i> Print
+							</button>
 						</span>
 					</div>
 
@@ -262,11 +264,12 @@ include 'db_connect.php'; ?>
 										<th class="">Visitor ID</th>
 										<th class="">Full Name</th>
 										<th class="">Email</th>
-										<th class="">Entered In</th>
 										<th class="">Purposse</th>
-										<th class="">Date</th>
+										<th class="">Date></th>
 										<th class="">Time - in</th>
 										<th class="">Time - out</th>
+										<th class="">Entered In</th>
+										<th class="text-center">Action</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -317,10 +320,6 @@ include 'db_connect.php'; ?>
 												<p> <?php echo $row['email'] ?></p>
 											</td>
 											<td class="">
-
-												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
-											</td>
-											<td class="">
 												<p> <?php echo $row['purpose'] ?></p>
 											</td>
 											<td class="">
@@ -332,6 +331,18 @@ include 'db_connect.php'; ?>
 											<td class="">
 												<p> <?php echo ucwords($row['time_out']) ?></p>
 											</td>
+											<td class="">
+
+												<p><?php echo htmlspecialchars($row['establishment_name'] ?? 'Unknown') ?></p>
+											</td>
+											<td class="text-center">
+												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
+
+													<button class="btn btn-sm btn-outline-danger delete_visitor"
+														type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
+												</div>
+											</td>
+
 										</tr>
 									<?php endwhile; ?>
 								</tbody>
@@ -361,38 +372,25 @@ include 'db_connect.php'; ?>
 </style>
 <script>
 
-
-
-function _conf(msg, func, params = []) {
-    $('#confirm_modal .modal-body').html(msg);
-    $('#confirm_modal').modal('show');
-    $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
-}
-	$('#clear_logs').click(function () {
-    _conf("Are you sure you want to delete all visitor logs?", "confirm_clear_logs");
-});
-
-
 	$('#filter').click(function () {
 		location.replace("index.php?page=visitor&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
 
-	function confirm_clear_logs() {
-    clear_logs();
-}
-
-	function clear_logs() {
-	  start_load()
-			$.ajax({
-			url: 'ajax.php?action=clear_logs',
-			method: "POST",
+	function delete_visitor($id) {
+		start_load()
+		$.ajax({
+			url: 'ajax.php?action=delete_visitor',
+			method: 'POST',
+			data: { id: $id },
 			success: function (resp) {
-			  if (resp == 1) {
-					alert_toast("Visitor logs cleared succesffuly", "success")
-					setTimeout(function() {
-					location.reload()
-					}, 1500)}
-			    }
-			})
+				if (resp == 1) {
+					alert_toast("Data successfully deleted", 'success')
+					setTimeout(function () {
+						location.reload()
+					}, 1500)
+
+				}
+			}
+		})
 	}
 </script>
