@@ -216,14 +216,12 @@ include 'db_connect.php'; ?>
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
-						<b>Monitoring List</b>
+						<b>Visitors Logs</b>
 						<span class="d-flex flex-wrap gap-2 mt-2 mt-md-0">
-							<button class="btn btn-primary btn-sm mr-2" type="button" id="new_records">
-								<i class="fa fa-plus"></i> New
+							<button class="btn btn-danger btn-sm mr-2" type="button" id="delete_visitors">
+								<i class="fa fa-trash"></i> Delete Visitor Lists
 							</button>
-							<button class="btn btn-success btn-sm" type="button" id="print">
-								<i class="fa fa-print"></i> Print
-							</button>
+
 						</span>
 					</div>
 
@@ -260,16 +258,14 @@ include 'db_connect.php'; ?>
 								</colgroup>
 								<thead>
 									<tr>
-										<th class="text-center">#</th>
+										<th class="text-center">No.</th>
+										<th class="">Visitor ID</th>
+										<th class="">Full Name</th>
+										<th class="">Email</th>
+										<th class="">Contact Number</th>
+										<th class="">Purpose</th>
 										<th class="">Date</th>
-										<th class="">Student Number</th>
-										<th class="">Name</th>
-										<th class="">College</th>
-										<th class="">Course</th>
-										<th class="">Year</th>
-										<th class="">Standing</th>
-										<th class="">Establishment</th>
-										<th class="text-center">Action</th>
+
 									</tr>
 								</thead>
 								<tbody>
@@ -280,59 +276,45 @@ include 'db_connect.php'; ?>
 									$ewhere = '';
 									if ($_SESSION['login_establishment_id'] > 0)
 										$ewhere = " and t.establishment_id = '" . $_SESSION['login_establishment_id'] . "' ";
-									$tracks = $conn->query(
-										"SELECT
-												t.*,concat(p.lastname,', ',p.firstname,' ',p.middlename) as name,
-												p.college,
-												p.course,
-												p.year_level,
-												p.standing,
+                                        $tracks = $conn->query(
+                                       " SELECT
+                                            v.visitor_id,
+                                            v.full_name,
+                                            v.email,
+                                            v.contact_number,
+                                            v.purpose,
+                                            v.created_at
+                                        FROM
+                                            visitors v
+                                        ORDER BY
+                                            v.created_at DESC;
+"
 
-												e.name as ename,p.student_id
-												FROM person_tracks t
-												inner join persons p on p.id = t.person_id
-												inner join establishments e on e.id = t.establishment_id
-												where date(t.date_created) between '$from' and '$to' $ewhere order by t.id desc"
-									);
-
+                                        );
 									while ($row = $tracks->fetch_assoc()):
 										?>
 										<tr>
 
 											<td class="text-center"><?php echo $i++ ?></td>
-											<td class="">
-												<p> <?php echo date("M d,Y h:i A", strtotime($row['date_created'])) ?></b>
-												</p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['student_id'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo ucwords($row['name']) ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['college'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['course'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['year_level'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo $row['standing'] ?></p>
-											</td>
-											<td class="">
-												<p> <?php echo ucwords($row['ename']) ?></p>
-											</td>
-											<td class="text-center">
-												<div class="btn-group-vertical btn-group-sm d-block d-md-inline-block">
 
-													<button class="btn btn-sm btn-outline-danger delete_records"
-														type="button" data-id="<?php echo $row['id'] ?>">Delete</button>
-												</div>
+											<td class="">
+												<p> <?php echo $row['visitor_id'] ?></p>
 											</td>
-
+											<td class="">
+												<p> <?php echo ucwords($row['full_name']) ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['email'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['contact_number'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['purpose'] ?></p>
+											</td>
+											<td class="">
+												<p> <?php echo $row['created_at'] ?></p>
+											</td>
 										</tr>
 									<?php endwhile; ?>
 								</tbody>
@@ -361,73 +343,40 @@ include 'db_connect.php'; ?>
 	}
 </style>
 <script>
-	$(document).ready(function () {
-		$('table').dataTable()
-	})
-	$('#new_records').click(function () {
-		uni_modal("New Record", "manage_records.php")
-	})
 
-	$('.edit_records').click(function () {
-		uni_modal("Edit Record", "manage_records.php?id=" + $(this).attr('data-id'), "mid-large")
 
-	})
-	$('.delete_records').click(function () {
-		_conf("Are you sure to delete this Person?", "delete_records", [$(this).attr('data-id')])
-	})
-	$('#check_all').click(function () {
-		if ($(this).prop('checked') == true)
-			$('[name="checked[]"]').prop('checked', true)
-		else
-			$('[name="checked[]"]').prop('checked', false)
-	})
-	$('[name="checked[]"]').click(function () {
-		var count = $('[name="checked[]"]').length
-		var checked = $('[name="checked[]"]:checked').length
-		if (count == checked)
-			$('#check_all').prop('checked', true)
-		else
-			$('#check_all').prop('checked', false)
-	})
-	$('#print').click(function () {
-		start_load()
-		$.ajax({
-			url: "print_records.php",
-			method: "POST",
-			data: { from: '<?php echo $from ?>', to: "<?php echo $to ?>" },
-			success: function (resp) {
-				if (resp) {
-					var nw = window.open("", "_blank", "height=600,width=900")
-					nw.document.write(resp)
-					nw.document.close()
-					nw.print()
-					setTimeout(function () {
-						nw.close()
-						end_load()
-					}, 700)
-				}
-			}
-		})
-	})
 	$('#filter').click(function () {
-		location.replace("index.php?page=records&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
+		location.replace("index.php?page=visitor_list&from=" + $('[name="from"]').val() + "&to=" + $('[name="to"]').val())
 	})
 
-	function delete_records($id) {
-		start_load()
-		$.ajax({
-			url: 'ajax.php?action=delete_records',
-			method: 'POST',
-			data: { id: $id },
-			success: function (resp) {
-				if (resp == 1) {
-					alert_toast("Data successfully deleted", 'success')
-					setTimeout(function () {
-						location.reload()
-					}, 1500)
+    function _conf(msg, func, params = []) {
+        $('#confirm_modal .modal-body').html(msg);
+        $('#confirm_modal').modal('show');
+        $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+    }
 
-				}
-			}
-		})
-	}
+		$('#delete_visitors').click(function () {
+		_conf ("Delete All Visitors?" , "confirm_delete_visitors");
+		});
+
+		function confirm_delete_visitors() {
+		  delete_visitors();
+		}
+
+      function delete_visitors() {
+        start_load()
+          $.ajax({
+            url: 'ajax.php?action=delete_visitors',
+            method: 'POST',
+            success: function (resp) {
+              if (resp == 1) {
+                alert_toast("Visitor list cleared successfully", "success")
+                setTimeout(function () {
+                  location.reload()
+                }, 1500)
+              }
+            }
+
+          })
+      }
 </script>

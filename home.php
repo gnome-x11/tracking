@@ -12,7 +12,7 @@ if (isset($_SESSION["invalid_attempts"]) && $_SESSION["invalid_attempts"] >= 3) 
 
 $total_visitors_today = $conn->query("SELECT COUNT(*) as total FROM person_tracks WHERE DATE(date_created) = CURDATE()")->fetch_assoc()["total"];
 $total_establishments = $conn->query("SELECT COUNT(*) as total FROM establishments")->fetch_assoc()["total"];
-$total_visitors = $conn->query("SELECT COUNT(*) as total FROM visitors")->fetch_assoc()["total"];
+$total_visitors = $conn->query("SELECT COUNT(*) as total FROM visitors WHERE DATE(created_at) = CURDATE()")->fetch_assoc()["total"];
 $total_staff = $conn->query("SELECT COUNT(*) as total FROM users WHERE type = 2")->fetch_assoc()["total"];
 
 $college_course = [];
@@ -120,7 +120,6 @@ while ($row = $hourly_query->fetch_assoc()) {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-
             background-color: white;
         }
     </style>
@@ -476,7 +475,7 @@ while ($row = $hourly_query->fetch_assoc()) {
                           </div>
                           <div class="modal-body text-center">
                             <h4><strong>Entered <span id="timeInEstablishmentName"></span></strong></h4>
-                            <p class="text-success fs-5 mt-3">✔ Confirmed</p>
+                            <p class="text-success fs-5 mt-3">Confirmed</p>
                           </div>
                         </div>
                       </div>
@@ -492,7 +491,7 @@ while ($row = $hourly_query->fetch_assoc()) {
                           </div>
                           <div class="modal-body text-center">
                             <h4><strong>Exited <span id="timeOutEstablishmentName"></span></strong></h4>
-                            <p class="text-danger fs-5 mt-3">✔ Confirmed</p>
+                            <p class="text-danger fs-5 mt-3">Confirmed</p>
                           </div>
                         </div>
                       </div>
@@ -1035,14 +1034,6 @@ while ($row = $hourly_query->fetch_assoc()) {
                     });
 
 
-                    // Confirmation dialog function
-                      function _conf(message, callback, args = []) {
-                          if (confirm(message)) {
-                              if (typeof window[callback] === "function") {
-                                  window[callback](...args);
-                              }
-                          }
-                      }
 
                       // Handle button click and call _conf
                       $('.delete_records').click(function () {
