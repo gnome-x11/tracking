@@ -226,8 +226,8 @@ class Action
                         $mail->isSMTP();
                         $mail->Host = 'smtp.gmail.com';
                         $mail->SMTPAuth = true;
-                        $mail->Username = 'dex.raromin@gmail.com'; // Replace with your email
-                        $mail->Password = 'scnv ntfq vnjb bxov'; // Replace with your app password
+                        $mail->Username =  Replace with your email
+                        $mail->Password = Replace with your app password
                         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
                         $mail->Port = 465;
 
