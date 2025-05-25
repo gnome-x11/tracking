@@ -1,208 +1,16 @@
 <?php
 include 'db_connect.php'; ?>
 
-<div class="container-fluid">
 
-<style>
-	/* General Styles */
-	body {
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		background-color: #333;
-		color: #212529;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Establishment List</title>
+    <link rel="stylesheet" href="page-css/records.css">
+</head>
+<body>
 
-	}
-
-	.card {
-		border: 1.2px solidrgb(169, 169, 169);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-		background-color: white;
-		padding: 15px;
-		border-radius: 10px;
-		margin-top: 50px;
-	}
-
-	.card-header {
-		background-color:rgb(130, 213, 174);
-		border-bottom: 1px solid #dee2e6;
-		font-weight: 600;
-		font-size: 1.1rem;
-		padding: 1rem 1.25rem;
-		border-radius: 10px;
-	}
-
-	.card-body {
-		padding: 1.25rem;
-	}
-
-	label {
-		font-weight: 500;
-		margin-bottom: 0.5rem;
-	}
-
-	input[type="date"],
-	.form-control,
-	select {
-		border-radius: 8px;
-		border: 1px solid #ced4da;
-		padding: 0.6rem 0.75rem;
-	}
-
-	.btn {
-		border-radius: 8px;
-		font-size: 0.95rem;
-		padding: 0.5rem 1.2rem;
-		transition: all 0.3s ease;
-	}
-
-	.btn-primary {
-		background-color: #0d6efd;
-		border-color: #0d6efd;
-	}
-
-	.btn-success {
-		background-color: #198754;
-		border-color: #198754;
-	}
-
-	.btn-outline-primary,
-	.btn-outline-danger {
-		border-width: 1px;
-	}
-
-	.btn:hover {
-		opacity: 0.9;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		margin-top: 1rem;
-	}
-
-	th, td {
-		padding: 0.75rem;
-		border-bottom: 1px solidrgb(75, 238, 91);
-
-	}
-
-	th {
-		background-color:rgb(65, 178, 125);
-		font-weight: 600;
-		text-align: left;
-		color: white;
-
-	}
-
-	.table-responsive {
-
-		overflow-x: auto;
-	}
-
-	@media (max-width: 768px) {
-		.card-header .btn {
-			margin-top: 10px;
-			width: 100%;
-		}
-
-		.form-group .col-md-4,
-		.form-group .col-md-2 {
-			width: 100%;
-			margin-bottom: 10px;
-		}
-	}
-</style>
-
-	<style>
-		input[type=checkbox] {
-			/* Double-sized Checkboxes */
-			-ms-transform: scale(1.5);
-			/* IE */
-			-moz-transform: scale(1.5);
-			/* FF */
-			-webkit-transform: scale(1.5);
-			/* Safari and Chrome */
-			-o-transform: scale(1.5);
-			/* Opera */
-			transform: scale(1.5);
-			padding: 10px;
-
-			@media (max-width: 768px) {
-				.card-header .btn {
-					margin-top: 10px;
-					width: 100%;
-				}
-
-				.form-group .col-md-4,
-				.form-group .col-md-2 {
-					width: 100%;
-					margin-bottom: 10px;
-				}
-
-				.card-body {
-					overflow-x: auto;
-				}
-
-				table {
-					min-width: 800px;
-				}
-			}
-
-		}
-
-
-		.modal-dialog {
-			margin-top: 10vh;
-		}
-
-
-		.modal-content {
-			max-height: 80vh;
-
-			overflow-y: auto;
-
-		}
-
-		.toast {
-			display: none;
-			min-width: 20vw
-		}
-
-		.toast.show {
-			display: block;
-			opacity: 1;
-			position: fixed;
-			z-index: 99999999;
-			margin: 20px;
-			right: 0;
-			top: 3.5rem;
-		}
-		.back-to-top {
-  position: fixed;
-  display: none;
-  right: 15px;
-  bottom: 15px;
-  z-index: 99999;
-}
-
-.back-to-top i {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-  background: #1977cc;
-  color: #fff;
-  transition: all 0.4s;
-}
-
-.back-to-top i:hover {
-  background: #1c84e3;
-  color: #fff;
-}
-
-	</style>
+    <div class="container-fluid">
 	<div class="col-lg-12">
 		<div class="row mb-4 mt-4">
 			<div class="col-md-12">
@@ -265,7 +73,7 @@ include 'db_connect.php'; ?>
 										<th class="text-center">#</th>
 										<th class="">Date</th>
 										<th class="">Student Number</th>
-										<th class="">Name</th>
+										<th class="">Photo</th>										<th class="">Name</th>
 										<th class="">College</th>
 										<th class="">Course</th>
 										<th class="">Year</th>
@@ -288,6 +96,7 @@ include 'db_connect.php'; ?>
 												p.course,
 												p.year_level,
 												p.standing,
+												p.photo,
 
 												e.name as ename,p.student_id
 												FROM person_tracks t
@@ -308,6 +117,10 @@ include 'db_connect.php'; ?>
 											<td class="">
 												<p> <?php echo $row['student_id'] ?></p>
 											</td>
+											<td class="">
+											<img style="height: auto; width: 60px;" src="uploads/<?php echo $row['photo']?>">
+											</td>
+
 											<td class="">
 												<p> <?php echo ucwords($row['name']) ?></p>
 											</td>
@@ -340,22 +153,11 @@ include 'db_connect.php'; ?>
 		</div>
 	</div>
 
-</div>
-<style>
-	td {
-		vertical-align: middle !important;
-	}
+    </div>
+</body>
+</html>
 
-	td p {
-		margin: unset
-	}
-
-	img {
-		max-width: 100px;
-		max-height: 150px;
-	}
-</style>
-<script>
+    <script>
 	$(document).ready(function () {
 		$('table').dataTable()
 	})
@@ -409,30 +211,30 @@ include 'db_connect.php'; ?>
 	})
 
 	function _conf(msg, func, params = []) {
-          $('#confirm_modal .modal-body').html(msg);
-          $('#confirm_modal').modal('show');
-          $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
-      }
-         	$('#clear_records').click(function () {
-                    _conf("Are you sure you want to delete all records?", "confirm_clear_records");
-                });
+              $('#confirm_modal .modal-body').html(msg);
+              $('#confirm_modal').modal('show');
+              $('#confirm_modal #confirm').attr('onclick', func + "(" + params.map(JSON.stringify).join(',') + ")");
+          }
+             	$('#clear_records').click(function () {
+                        _conf("Are you sure you want to delete all records?", "confirm_clear_records");
+                    });
 
-         	function confirm_clear_records() {
-                                  clear_records();
-                              }
+             	function confirm_clear_records() {
+                                      clear_records();
+                                  }
 
-         	function clear_records() {
-         	  start_load()
-         			$.ajax({
-         			url: 'ajax.php?action=clear_records',
-         			method: "POST",
-         			success: function (resp) {
-         			  if (resp == 1) {
-         					alert_toast(" Cleared succesffuly", "success")
-         					setTimeout(function() {
-         					location.reload()
-         					}, 1500)}
-         			    }
-         			})
-         	}
-</script>
+             	function clear_records() {
+             	  start_load()
+             			$.ajax({
+             			url: 'ajax.php?action=clear_records',
+             			method: "POST",
+             			success: function (resp) {
+             			  if (resp == 1) {
+             					alert_toast(" Cleared succesffuly", "success")
+             					setTimeout(function() {
+             					location.reload()
+             					}, 1500)}
+             			    }
+             			})
+             	}
+    </script>

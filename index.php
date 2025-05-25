@@ -73,12 +73,18 @@
     <div class="toast-body text-white">
     </div>
   </div>
+  <?php if ($_SESSION["login_type"] == 1): ?>
   <main id="view-panel">
     <?php $page = isset($_GET['page']) ? $_GET['page'] : 'home'; ?>
     <?php include $page . '.php' ?>
-
-
   </main>
+<?php endif?>
+  <?php if ($_SESSION["login_type"] == 2): ?>
+  <main id="view-panel">
+    <?php $page = isset($_GET['page']) ? $_GET['page'] : 'staff_dashboard'; ?>
+    <?php include $page . '.php' ?>
+  </main>
+<?php endif?>
 
   <div id="preloader"></div>
   <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
@@ -212,10 +218,7 @@
     format: 'Y/m/d H:i',
     startDate: '+3d'
   })
-  $('.select2').select2({
-    placeholder: "Please select here",
-    width: "100%"
-  })
+
 </script>
 
 </html>

@@ -303,7 +303,7 @@
           if(resp == 1) {
             location.href = 'index.php';
           } else if(resp == 2) {
-            location.href = 'dashboard.php';
+            location.href = 'staff_dashboard.php';
           } else {
             $('#login-form').prepend(
               '<div class="alert alert-danger">' +

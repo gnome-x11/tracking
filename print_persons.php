@@ -3,8 +3,8 @@ include 'db_connect.php';
 
 $ids = $_POST['ids'] ?? [];
 $id_list = implode(",", array_map('intval', $ids));
-$persons = $conn->query("SELECT *, concat(lastname,', ',firstname,' ',middlename) as name, 
-        concat(address,', ',street,', ',baranggay,', ',city,', ',state,', ',zip_code) as caddress 
+$persons = $conn->query("SELECT *, concat(lastname,', ',firstname,' ',middlename) as name,
+        concat(address,', ',street,', ',baranggay,', ',city,', ',state,', ',zip_code) as caddress
         FROM persons WHERE id IN ($id_list)");
 ?>
 <!DOCTYPE html>
@@ -12,168 +12,9 @@ $persons = $conn->query("SELECT *, concat(lastname,', ',firstname,' ',middlename
 
 <head>
     <title>PLMUN_STUDENT_ID</title>
+    <link rel="stylesheet"  href="page-css/print_person.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style type="text/css">
-        :root {
-            --plmun-dark-green: #006400;
-            --plmun-light-green: #228B22;
-            --plmun-gold: #D4AF37;
-        }
-
-        body {
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-
-        .id-card {
-            top: 100px;
-
-            align-items: center;
-            width: 100%;
-            max-width: 380px;
-            border: 4px solid var(--plmun-dark-green);
-            border-radius: 12px;
-            padding: 25px;
-            background: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin: 20px auto;
-            page-break-after: always;
-            position: relative;
-            bottom: 100px;
-        }
-
-        .id-header {
-            text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--plmun-gold);
-        }
-
-        .school-logo {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 15px;
-        }
-
-        .school-name {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--plmun-dark-green);
-            margin-bottom: 5px;
-            text-align: center;
-        }
-
-        .student-photo {
-            width: 150px;
-            height: 150px;
-            margin: 15px auto;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .student-name {
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            margin: 10px 0 5px;
-        }
-
-        .student-id {
-            font-size: 16px;
-            text-align: center;
-            color: var(--plmun-dark-green);
-            font-weight: 500;
-            margin-bottom: 30px;
-        }
-
-        .id-qr-container {
-            text-align: center;
-            margin: 20px 0;
-            min-height: 180px;
-            /* Fixed height to prevent overlap */
-        }
-
-        .qr-code {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto;
-            border: 0 none;
-            padding: 5px;
-            background: white;
-            display: block;
-            /* Ensures proper rendering */
-        }
-
-        .student-details {
-            font-size: 12px;
-            line-height: 1.4;
-            margin-top: 10px;
-            color: #222;
-        }
-
-        .student-details .detail-line {
-            margin-bottom: 2px;
-        }
-
-        .student-details .label {
-            font-weight: 600;
-            color: var(--plmun-dark-green);
-        }
-
-        .student-photo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
-            /* Optional: fallback bg */
-        }
-
-        .student-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .student-photo .default-icon {
-            font-size: 48px;
-            color: #006400;
-        }
-
-
-
-        .id-footer {
-            text-align: center;
-            font-size: 11px;
-            color: #666;
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-
-        @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
-            }
-
-            .id-card {
-                box-shadow: none;
-                margin: 0 auto;
-                border-width: 3px;
-            }
-
-            .id-qr-container {
-                page-break-inside: avoid;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -224,7 +65,7 @@ $persons = $conn->query("SELECT *, concat(lastname,', ',firstname,' ',middlename
         </div>
     <?php endwhile; ?>
 
-  
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
