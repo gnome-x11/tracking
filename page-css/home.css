@@ -1,6 +1,12 @@
+view-panel{
+    padding: 0;
+    margint: 0;
+
+}
+
 body {
     padding-top: 60px;
-    background-color: rgb(160, 236, 185);
+    background-color: rgb(255, 255, 255);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     /* Hide scrollbar for all browsers */
     overflow-y: scroll;

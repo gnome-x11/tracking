@@ -83,7 +83,7 @@
 <script>
     $(document).ready(function () {
         // Highlight active menu item
-        var currentPage = '<?php echo isset($_GET['page']) ? $_GET['page'] : 'dashboard'; ?>';
+        var currentPage = '<?php echo isset($_GET['page']) ? $_GET['page'] : 'index'; ?>';
         $('.nav-item').removeClass('active');
         $('.nav-' + currentPage).addClass('active');
 

@@ -31,7 +31,7 @@ class Action
                   }
                   return 1;
             } else {
-                  return 3;
+                  return 2;
             }
       }
       function logout()
@@ -162,46 +162,47 @@ class Action
                   return 1;
             }
       }
+
       function save_visitor()
       {
-          extract($_POST);
+            extract($_POST);
 
-          if (empty($full_name) || empty($email)) {
-              return json_encode(["status" => "error", "message" => "Full Name and Email are Required"]);
-          }
+            if (empty($full_name) || empty($email)) {
+                  return json_encode(["status" => "error", "message" => "Full Name and Email are Required"]);
+            }
 
-          // Generate token and expiry
-          $token = bin2hex(random_bytes(16));
-          $token_expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
+            // Generate token and expiry
+            $token = bin2hex(random_bytes(16));
+            $token_expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
-          $imagePath = null;
+            $imagePath = null;
 
-          if (!empty($_POST['captured_image'])) {
-              $img = $_POST['captured_image'];
-              $img = str_replace('data:image/png;base64,', '', $img);
-              $img = str_replace(' ', '+', $img);
-              $image_data = base64_decode($img);
-              $fileName = 'visitor_' . time() . '.png';
-              $imagePath = 'visitor_img/' . $fileName;
+            if (!empty($_POST['captured_image'])) {
+                  $img = $_POST['captured_image'];
+                  $img = str_replace('data:image/png;base64,', '', $img);
+                  $img = str_replace(' ', '+', $img);
+                  $image_data = base64_decode($img);
+                  $fileName = 'visitor_' . time() . '.png';
+                  $imagePath = 'visitor_img/' . $fileName;
 
-              if (!is_dir('visitor_img')) {
-                  mkdir('visitor_img', 0755, true);
-              }
+                  if (!is_dir('visitor_img')) {
+                        mkdir('visitor_img', 0755, true);
+                  }
 
-              file_put_contents($imagePath, $image_data);
-          }
+                  file_put_contents($imagePath, $image_data);
+            }
 
-          $data = "full_name = '$full_name'";
-          $data .= ", contact_number = '$contact_number'";
-          $data .= ", email = '$email'";
-          $data .= ", purpose = '$purpose'";
-          $data .= ", establishment_id = " . intval($establishment_id);
-          $data .= ", created_at = '$created_at'";
-          $data .= ", token = '$token'";
-          $data .= ", token_expiry = '$token_expiry'";
-          $data .= ", imagePath = '$imagePath'";
+            $data = "full_name = '$full_name'";
+            $data .= ", contact_number = '$contact_number'";
+            $data .= ", email = '$email'";
+            $data .= ", purpose = '$purpose'";
+            $data .= ", establishment_id = " . intval($establishment_id);
+            $data .= ", created_at = '$created_at'";
+            $data .= ", token = '$token'";
+            $data .= ", token_expiry = '$token_expiry'";
+            $data .= ", imagePath = '$imagePath'";
 
-          $save = $this->db->query("INSERT INTO visitors SET $data");
+            $save = $this->db->query("INSERT INTO visitors SET $data");
 
             if ($save) {
                   $visitor_id = $this->db->insert_id;
@@ -335,7 +336,7 @@ class Action
             extract($_POST);
             $delete = $this->db->query("DELETE FROM person_tracks");
             if ($delete) {
-                return 1;
+                  return 1;
             }
       }
 
